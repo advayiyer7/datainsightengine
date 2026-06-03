@@ -1,0 +1,79 @@
+# Insight Engine configuration.
+# Everything here is optional — sensible defaults live in src/insight/config.py.
+# Edit thresholds to tune detector sensitivity for your dataset.
+
+# ---------------------------------------------------------------------------
+# Tier 0 — schema mapping override.
+# The ingest step fuzzy-matches your CSV headers to the canonical fields the
+# detectors need. If a guess is wrong, force it here: canonical_field: CSV_Header
+# Canonical fields: supplier, item, quantity, unit_price, total, order_date,
+#   category, shipping_cost, lead_time, delivery_date, risk_score, country,
+#   order_status, negotiated_price, defective_units, compliance
+# ---------------------------------------------------------------------------
+column_map:
+  supplier: Supplier
+  item: Item_Category          # this dataset has no SKU; category is the finest grain
+  category: Item_Category
+  quantity: Quantity
+  unit_price: Unit_Price
+  negotiated_price: Negotiated_Price
+  order_date: Order_Date
+  delivery_date: Delivery_Date
+  order_status: Order_Status
+  defective_units: Defective_Units
+  compliance: Compliance
+
+# ---------------------------------------------------------------------------
+# LLM settings. Key is read from the ANTHROPIC_API_KEY env var — never hardcode.
+# ---------------------------------------------------------------------------
+llm:
+  narrator_model: claude-haiku-4-5       # cheap narrator + judge
+  agentic_model: claude-haiku-4-5        # bump to e.g. claude-sonnet-4-6 for harder discovery
+  baseline_model: claude-haiku-4-5       # B0 dump-to-LLM baseline
+  # Approx USD per million tokens, used only for cost estimates in the report.
+  price_per_mtok_input: 1.0
+  price_per_mtok_output: 5.0
+  max_output_tokens: 4096
+
+# ---------------------------------------------------------------------------
+# Tier 1 — detector thresholds.
+# ---------------------------------------------------------------------------
+detectors:
+  fragmented_orders:
+    min_orders: 3            # >= this many orders...
+    window_days: 30          # ...within this rolling window (same supplier+item)
+    shipping_cost_per_order: 250.0   # assumed avoidable handling/shipping per redundant order
+  supplier_concentration:
+    share_threshold: 0.5     # flag category where top supplier exceeds this spend share
+    hhi_threshold: 0.30      # OR Herfindahl index above this
+  maverick_price_variance:
+    min_orders: 3            # need at least this many buys of the item to compare
+    variance_pct: 0.15       # flag if (max-min)/min unit price exceeds this
+  tail_spend:
+    spend_quantile: 0.20     # suppliers in the bottom X of spend are "tail"
+    max_share: 0.05          # ...and collectively below this share of total spend
+    processing_cost_per_order: 100.0  # assumed cost to process one PO
+  single_source_risk:
+    min_spend: 10000.0       # only flag single-sourced items above this spend
+  timing_anomaly:
+    lead_time_z: 2.0         # lead-time outlier if z-score beyond this vs supplier norm
+    end_of_period_share: 0.40  # flag if > this share of a supplier's orders land in last month of quarter
+  duplicate_order:
+    window_days: 5           # same supplier+item+amount within this window = suspected duplicate
+    amount_tol_pct: 0.01     # total amounts within 1% count as identical
+
+# ---------------------------------------------------------------------------
+# Tier 3 — agentic discovery bounds (enforced, non-negotiable).
+# ---------------------------------------------------------------------------
+agentic:
+  max_iterations: 8
+  max_wall_clock_seconds: 120
+  max_tokens: 60000
+  goal: "Find avoidable procurement cost or anomalies worth more than $5000 that the fixed detectors might miss."
+
+# ---------------------------------------------------------------------------
+# Evaluation harness.
+# ---------------------------------------------------------------------------
+evaluate:
+  slices: [0.1, 0.25, 0.5, 1.0]
+  baseline_max_rows: 400     # cap rows fed into B0 dump-to-LLM (context budget); sample beyond this

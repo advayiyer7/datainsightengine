@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "insight-engine"
+version = "0.1.0"
+description = "Cheap procurement insight engine: deterministic detectors + thin LLM narrator + bounded agentic discovery, with a quality-vs-cost evaluation harness."
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "Insight Engine" }]
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "PyYAML>=6.0",
+    "matplotlib>=3.7",
+    "anthropic>=0.40",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+insight = "insight.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
