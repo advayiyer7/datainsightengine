@@ -22,3 +22,5 @@ data2/
 data2.zip
 data2.csv
 *.csv.zip
+# ~29MB regenerable detector dump on the big dataset
+findings_data2.json

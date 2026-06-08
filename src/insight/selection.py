@@ -98,11 +98,17 @@ def select_findings(
     top_n: int = 8,
     formula: str = "severity_x_impact",
     null_impact_usd: float = 20000.0,
+    max_per_type: int | None = None,
 ) -> list[InsightGroup]:
     """Merge, score, and return the top-``top_n`` groups, highest score first.
 
     Each group's score is the **max** score over its members (the strongest signal
     drives the ranking), so merging never dilutes an important finding.
+
+    ``max_per_type`` caps how many groups of any one detector type appear, so the
+    report stays diverse when one type dominates the high-impact tail (e.g. many
+    billion-dollar single-source contracts). If the cap leaves fewer than ``top_n``,
+    the remainder is back-filled by score regardless of type.
     """
     groups = merge_findings(findings)
     for g in groups:
@@ -111,7 +117,28 @@ def select_findings(
             default=0.0,
         )
     groups.sort(key=lambda g: g.score, reverse=True)
-    return groups[: max(0, top_n)]
+    top_n = max(0, top_n)
+    if not max_per_type:
+        return groups[:top_n]
+
+    chosen: list[InsightGroup] = []
+    counts: dict[str, int] = {}
+    for g in groups:
+        t = g.representative.type
+        if counts.get(t, 0) < max_per_type:
+            chosen.append(g)
+            counts[t] = counts.get(t, 0) + 1
+        if len(chosen) >= top_n:
+            return chosen
+    # Back-fill if the per-type cap left us short of top_n.
+    if len(chosen) < top_n:
+        picked = set(id(g) for g in chosen)
+        for g in groups:
+            if id(g) not in picked:
+                chosen.append(g)
+                if len(chosen) >= top_n:
+                    break
+    return chosen[:top_n]
 
 
 def selected_findings(groups: list[InsightGroup]) -> list[Finding]:

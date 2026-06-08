@@ -59,17 +59,27 @@ def judge_findings(
     client: LLMClient,
     *,
     max_judged: int = 15,
+    representative: bool = False,
     fallback_scores: dict[str, int] | None = None,
 ) -> JudgeResult:
-    """Score up to ``max_judged`` findings (highest severity first).
+    """Score up to ``max_judged`` findings.
 
-    ``fallback_scores`` maps a finding key -> analyst validity, used when the LLM is
-    unavailable. Findings with neither LLM nor fallback score get a neutral 1.
+    By default the highest-severity findings are judged (right for a curated set you
+    want assessed exactly). With ``representative=True`` and more findings than the
+    cap, a deterministic random sample is judged instead — an UNBIASED precision
+    estimate for a large population (e.g. all raw detector findings), so judging the
+    full set isn't required. ``fallback_scores`` maps key -> validity for the no-LLM
+    path; unknown findings get a neutral 1.
     """
     if not findings:
         return JudgeResult(scores=[], used_llm=False)
 
-    ranked = sorted(findings, key=lambda f: f.severity, reverse=True)[:max_judged]
+    max_judged = max(1, min(max_judged, 60))  # hard cap to bound tokens
+    if len(findings) > max_judged and representative:
+        import random
+        ranked = random.Random(0).sample(findings, max_judged)
+    else:
+        ranked = sorted(findings, key=lambda f: f.severity, reverse=True)[:max_judged]
 
     if client.available:
         payload = [

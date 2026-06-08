@@ -192,13 +192,25 @@ def clean(
     else:
         out["row_id"] = ["row_" + str(i) for i in range(len(out))]
 
-    # Numerics.
+    # Numerics. Strip currency symbols / thousands separators / parens-negatives
+    # ("$1,234.50", "(45.00)") before coercion so prices written as money parse.
     for col in ["quantity", "unit_price", "negotiated_price", "total",
                 "shipping_cost", "lead_time", "risk_score", "defective_units"]:
         if col in out.columns:
-            before_bad = out[col].apply(lambda v: isinstance(v, str)).sum()
-            out[col] = pd.to_numeric(out[col], errors="coerce")
-            rep.coerced_numeric[col] = int(before_bad)
+            # Non-numeric (object OR pandas-3.0 `str` dtype) may hold currency text
+            # like "$1,234.00" or "(45.00)" — strip it before coercion.
+            if not pd.api.types.is_numeric_dtype(out[col]):
+                s = out[col].astype(str).str.strip()
+                # "(45.00)" accounting-negative -> "-45.00"
+                s = s.str.replace(r"^\((.*)\)$", r"-\1", regex=True)
+                s = s.str.replace(r"[\$,]", "", regex=True).str.strip()
+                num = pd.to_numeric(s, errors="coerce")
+                before_bad = int((num.isna() & out[col].notna()).sum())
+                out[col] = num
+            else:
+                out[col] = pd.to_numeric(out[col], errors="coerce")
+                before_bad = 0
+            rep.coerced_numeric[col] = before_bad
 
     # Dates.
     for col in ["order_date", "delivery_date"]:

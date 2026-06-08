@@ -1,0 +1,109 @@
+{
+  "report": {
+    "used_llm": true,
+    "n_selected_findings": 13,
+    "grounding": {
+      "ok": false,
+      "total_numbers": 28,
+      "matched": 27,
+      "unmatched": [
+        {
+          "text": "106%",
+          "value": 106.0,
+          "kind": "pct"
+        }
+      ]
+    },
+    "spurious_before": 15,
+    "spurious_after": 1,
+    "total_numbers": 28,
+    "spurious_rate_after": 0.0357,
+    "insights": [
+      {
+        "title": "Critical Single-Source Dependency for High-Value Health Plan Contract",
+        "what": "Care Health Plan with no alternative suppliers. This represents 1 order totaling $3,194,190,000 in spend with zero supply redundancy.",
+        "why": "Concentration of this magnitude with a single supplier creates severe operational and financial risk. Any service disruption, contract termination, or performance failure by L.A. Care Health Plan would immediately impact $3,194,190,000 in procurement without fallback options.",
+        "action": "Develop a dual-sourcing strategy to split future orders and reduce dependency on L.A. Care Health Plan, or establish a formal contingency plan with documented service level agreements and transition protocols.",
+        "est_impact_usd": 3194190000.0,
+        "source_types": [
+          "single_source_risk"
+        ]
+      },
+      {
+        "title": "Critical Single-Source Dependency for High-Value Item",
+        "what": "",
+        "why": "Reliance on a single supplier for a $2.47 billion commitment creates severe supply chain vulnerability. Any disruption\u2014financial instability, operational failure, or service degradation\u2014would have no fallback, directly impacting service delivery and budget continuity.",
+        "action": "Conduct financial and operational due diligence on Health Net Community Solutions, Inc., and negotiate a dual-source or tiered supply agreement to mitigate the $2,474,118,000 at-risk exposure.",
+        "est_impact_usd": 2474118000.0,
+        "source_types": [
+          "single_source_risk"
+        ]
+      },
+      {
+        "title": "Critical Single-Source Dependency on Health Net Community Solutions",
+        "what": "",
+        "why": "Sole-source arrangements create significant supply chain vulnerability. Any disruption\u2014service failure, financial instability, or contract termination\u2014would leave the organization without recourse and unable to fulfill this critical need.",
+        "action": "Develop a transition plan to split future orders between suppliers, reducing exposure from the current $2,253,227,000 single-source risk.",
+        "est_impact_usd": 2253227000.0,
+        "source_types": [
+          "single_source_risk"
+        ]
+      },
+      {
+        "title": "Severe Price Variance in L E Training: 106% Overpayment Risk",
+        "what": "Consolidating to the lowest-cost supplier could save approximately $163,216,677. Additionally, 6 fragmented orders placed within 0 days to San Diego Regional Training Center create redundant shipping costs of ~$1,250.",
+        "why": "Paying more than double the benchmark price for the same service is unsustainable. Fragmented orders within the same day indicate poor procurement coordination and waste on duplicate handling and shipping.",
+        "action": "Immediately shift L E Training volume to the lowest-cost supplier (Unknown at $186,807.39/unit). Consolidate all future orders into single shipments to eliminate redundant shipping charges and enforce centralized ordering.",
+        "est_impact_usd": 163216677.06,
+        "source_types": [
+          "fragmented_orders",
+          "maverick_price_variance"
+        ]
+      },
+      {
+        "title": "Duplicate Order + Single-Source Risk: MCCF from The GEO Group Inc",
+        "what": "Two near-identical orders to The GEO Group Inc for MCCF, each worth $76,675,000, were placed 0 days apart\u2014indicating a likely duplicate. MCCF is sourced solely from The GEO Group Inc with total spend of $153,350,000 across 2 orders.",
+        "why": "The duplicate order represents potential waste of $76,675,000 if unintentional. Combined with single-source dependency, the organization has no alternative supplier and no safeguard against duplicate processing errors.",
+        "action": "Immediately investigate and cancel the duplicate order if confirmed. Recover the $76,675,000 if possible. Simultaneously, qualify alternative suppliers for MCCF to eliminate single-source risk and prevent future duplicate orders through improved order controls.",
+        "est_impact_usd": 153350000.0,
+        "source_types": [
+          "duplicate_order",
+          "single_source_risk"
+        ]
+      },
+      {
+        "title": "Critical TRA Pricing Disparity Across 22 Suppliers",
+        "what": "Across 372 orders evaluated, this supplier variance represents a $149,396,478 overpayment opportunity.",
+        "why": "Maverick buying and fragmented supplier selection are driving massive price inefficiency on a high-volume commodity. The 22-supplier landscape suggests spend is scattered without consolidation discipline, allowing the worst performer to command nearly double the best price.",
+        "action": "Immediately audit the 372 TRA orders and consolidate volume toward TECHNOLOGY DEVELOPMENT CENTER INC. Renegotiate or exit MTI College contracts. Implement a single-source or dual-source strategy with price-lock agreements to eliminate the $149,396,478 annual leakage.",
+        "est_impact_usd": 149396478.15,
+        "source_types": [
+          "maverick_price_variance"
+        ]
+      },
+      {
+        "title": "Duplicate Order + Single-Source Risk + Fragmentation: Engineering/Environmental from MWH",
+        "what": "Two near-identical orders to MWH for Engineering/Environmental, each worth $8,000,000, were placed 0 days apart\u2014indicating a likely duplicate. Engineering/Environmental is sourced solely from MWH with $36,500,000 across 5 orders. Five orders placed within 0 days incur ~$1,000 in redundant shipping.",
+        "why": "The duplicate order wastes $8,000,000 if unintentional. Single-source dependency on MWH eliminates competitive alternatives and negotiating power. Fragmented orders within the same day indicate poor procurement planning and unnecessary logistics costs.",
+        "action": "Investigate and cancel the duplicate order immediately; recover the $8,000,000 if possible. Qualify alternative suppliers for Engineering/Environmental services. Consolidate all future orders into single shipments and implement order-batching controls to prevent fragmentation and duplicate processing.",
+        "est_impact_usd": 36500000.0,
+        "source_types": [
+          "duplicate_order",
+          "fragmented_orders",
+          "single_source_risk"
+        ]
+      },
+      {
+        "title": "Duplicate Order + Single-Source Risk: Parolee Labor Program from CDCR",
+        "what": "Two near-identical orders to California Department of Corrections and Rehabilitation (CDCR) for Parolee Labor Program, each worth $7,200,000, were placed 0 days apart\u2014indicating a likely duplicate. Parolee Labor Program is sourced solely from CDCR with $29,400,000 across 3 orders.",
+        "why": "The duplicate order represents potential waste of $7,200,000 if unintentional. Single-source dependency on CDCR eliminates alternative labor program options and creates operational risk if CDCR cannot fulfill demand.",
+        "action": "Immediately investigate and cancel the duplicate order if confirmed; recover the $7,200,000 if possible. Research alternative parolee labor or workforce programs to reduce single-source dependency. Implement order-review controls to prevent duplicate submissions.",
+        "est_impact_usd": 29400000.0,
+        "source_types": [
+          "duplicate_order",
+          "single_source_risk"
+        ]
+      }
+    ]
+  }
+}

@@ -50,6 +50,26 @@ def test_select_top_n_ranks_by_business_impact_and_truncates():
     assert top[0].score > top[1].score
 
 
+def test_max_per_type_diversifies_selection():
+    # 5 high-impact single-source findings + 2 lower ones of other types.
+    findings = [mk("single_source_risk", 0.9, 1e9 - i, {"item": f"x{i}"}) for i in range(5)]
+    findings.append(mk("maverick_price_variance", 0.8, 5000.0, {"item": "m"}))
+    findings.append(mk("duplicate_order", 0.7, 4000.0, {"supplier": "s", "item": "d"}))
+    top = select_findings(findings, top_n=4, max_per_type=2)
+    types = [g.representative.type for g in top]
+    # at most 2 of the dominant type, and other types get a seat
+    assert types.count("single_source_risk") == 2
+    assert "maverick_price_variance" in types
+    assert len(top) == 4
+
+
+def test_max_per_type_backfills_when_short():
+    # Only one type present; cap shouldn't prevent filling top_n.
+    findings = [mk("single_source_risk", 0.9, 1e6 - i, {"item": f"x{i}"}) for i in range(5)]
+    top = select_findings(findings, top_n=4, max_per_type=2)
+    assert len(top) == 4  # back-filled past the per-type cap
+
+
 def test_selection_keeps_qualitative_findings_via_null_impact():
     # A high-severity but impact-less finding should still rank above a trivial one.
     risky = mk("supplier_concentration", 0.95, None, {"category": "MRO", "supplier": "A"})

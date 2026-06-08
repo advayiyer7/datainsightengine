@@ -79,11 +79,12 @@ class NarrationResult:
     spurious_before: int = 0
     spurious_after: int = 0
     total_numbers: int = 0
+    total_before: int = 0
     raw_response: str = ""
 
     @property
     def spurious_rate_before(self) -> float:
-        return self.spurious_before / self.total_numbers if self.total_numbers else 0.0
+        return self.spurious_before / self.total_before if self.total_before else 0.0
 
     @property
     def spurious_rate_after(self) -> float:
@@ -319,6 +320,7 @@ def narrate(
     top_n: int = 8,
     rank_formula: str = "severity_x_impact",
     null_impact_usd: float = 20000.0,
+    max_per_type: int | None = None,
     rel_tol: float = 0.02,
     repair: bool = True,
 ) -> NarrationResult:
@@ -328,7 +330,8 @@ def narrate(
         return NarrationResult([], gr, used_llm=False,
                                markdown="# Procurement Insights Report\n\n_No findings._")
 
-    groups = select_findings(findings, top_n=top_n, formula=rank_formula, null_impact_usd=null_impact_usd)
+    groups = select_findings(findings, top_n=top_n, formula=rank_formula,
+                             null_impact_usd=null_impact_usd, max_per_type=max_per_type)
     sel = selected_findings(groups)
     model = client.cfg.get("narrator_model")
 
@@ -366,11 +369,13 @@ def narrate(
 
     # --- spurious-number measurement + repair (Fix 3) ---
     spurious_before = 0
+    total_before = 0
     if used_llm:
         for ins in insights:
             grp = groups[ins.group_id]
             gres = check_grounding(ins.text(), grp.members, rel_tol=rel_tol, ignore_below=12)
             spurious_before += len(gres.unmatched)
+            total_before += gres.total_numbers
             if repair and not gres.ok and client.available:
                 regen = _regenerate_insight(client, grp, ins.group_id, model)
                 if regen is not None:
@@ -401,6 +406,7 @@ def narrate(
         spurious_before=spurious_before,
         spurious_after=len(grounding.unmatched),
         total_numbers=grounding.total_numbers,
+        total_before=total_before,
         raw_response=raw,
     )
     res.markdown = _render_markdown(insights, used_llm, res)

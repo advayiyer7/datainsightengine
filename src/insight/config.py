@@ -30,6 +30,9 @@ DEFAULTS: dict[str, Any] = {
         # Dollar value assumed for findings with no est_impact_usd, so qualitative
         # risks (concentration, single-source) still rank instead of scoring 0.
         "null_impact_usd": 20000.0,
+        # Cap groups of any one detector type in the top-N so the report stays
+        # diverse when one type dominates the high-impact tail. null = no cap.
+        "max_per_type": 3,
     },
     "detectors": {
         "fragmented_orders": {

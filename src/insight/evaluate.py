@@ -146,7 +146,8 @@ def run_evaluation(
         return narrate(findings, client,
                        top_n=int(ncfg.get("top_n", 8)),
                        rank_formula=ncfg.get("rank_formula", "severity_x_impact"),
-                       null_impact_usd=float(ncfg.get("null_impact_usd", 20000.0)))
+                       null_impact_usd=float(ncfg.get("null_impact_usd", 20000.0)),
+                       max_per_type=ncfg.get("max_per_type"))
 
     # --- cost scaling across slices (B0 vs B1 vs SYS) ---
     scaling_rows: list[dict[str, Any]] = []
@@ -183,10 +184,12 @@ def run_evaluation(
     t = time.monotonic()
     b1 = run_all(full, detector_cfg)
     b1_rt = time.monotonic() - t
-    j = judge_findings(b1, _new_client(cfg), max_judged=max(1, len(b1)), fallback_scores=gold_scores)
+    j = judge_findings(b1, _new_client(cfg), max_judged=40, representative=True, fallback_scores=gold_scores)
     r, hit, tot = coverage(b1, gold)
     res_b1 = ApproachResult("B1 detectors (all)", len(b1), r, hit, tot, j.mean_score, j.valuable_fraction,
-                            Usage(), b1_rt, "no LLM; all raw findings, no selection")
+                            Usage(), b1_rt,
+                            f"no LLM; all {len(b1)} raw findings; validity from a random sample of "
+                            f"{min(40, len(b1))}")
     results.append(res_b1)
 
     # SYS — detectors + narrator, scored on the NARRATED TOP-N SELECTION (not all findings).

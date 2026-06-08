@@ -1,0 +1,61 @@
+# Config for the California DGS purchasing dataset (data2/data2.csv, ~920k rows).
+# Prices are written as "$1,234.00" — the ingest cleaner strips currency symbols.
+
+column_map:
+  supplier: Supplier Name
+  item: Item Name
+  category: Acquisition Type      # coarse, always-populated category (IT Goods, NON-IT Services, ...)
+  quantity: Quantity
+  unit_price: Unit Price
+  total: Total Price
+  order_date: Creation Date       # Purchase Date is mostly empty in this dataset
+
+llm:
+  narrator_model: claude-haiku-4-5
+  agentic_model: claude-haiku-4-5
+  baseline_model: claude-haiku-4-5
+  price_per_mtok_input: 1.0
+  price_per_mtok_output: 5.0
+  max_output_tokens: 4096
+
+narrator:
+  top_n: 8
+  rank_formula: severity_x_impact
+  null_impact_usd: 20000.0
+  max_per_type: 3                   # keep the report diverse (not 8x single-source)
+
+detectors:
+  fragmented_orders:
+    min_orders: 4            # higher bar on a huge dataset to avoid a flood
+    window_days: 30
+    shipping_cost_per_order: 250.0
+  supplier_concentration:
+    share_threshold: 0.5
+    hhi_threshold: 0.30
+  maverick_price_variance:
+    min_orders: 5            # need a solid sample per supplier before flagging
+    variance_pct: 0.25
+    max_variance_pct: 1.5    # skip >150% spreads: generic item names spanning very
+                             # different contracts, not a real same-item overpayment
+  tail_spend:
+    spend_quantile: 0.20
+    max_share: 0.05
+    processing_cost_per_order: 100.0
+  single_source_risk:
+    min_spend: 100000.0      # only large single-sourced items on a big dataset
+  timing_anomaly:
+    lead_time_z: 2.0
+    end_of_period_share: 0.40
+  duplicate_order:
+    window_days: 5
+    amount_tol_pct: 0.01
+
+agentic:
+  max_iterations: 8
+  max_wall_clock_seconds: 150
+  max_tokens: 60000
+  goal: "Find avoidable procurement cost or anomalies worth more than $50000 that the fixed detectors might miss."
+
+evaluate:
+  slices: [0.05, 0.1, 0.25, 0.5, 1.0]
+  baseline_max_rows: 1500

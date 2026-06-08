@@ -92,6 +92,7 @@ def cmd_run(args) -> int:
         top_n=int(ncfg.get("top_n", 8)),
         rank_formula=ncfg.get("rank_formula", "severity_x_impact"),
         null_impact_usd=float(ncfg.get("null_impact_usd", 20000.0)),
+        max_per_type=ncfg.get("max_per_type"),
     )
     # The FULL finding set is persisted to findings.json; the report is the selected top-N.
     Path("findings.json").write_text(findings_to_json(findings), encoding="utf-8")

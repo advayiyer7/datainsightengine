@@ -44,6 +44,7 @@ narrator:
   top_n: 8                          # surface only the top-N selected insights
   rank_formula: severity_x_impact   # or "impact" or "severity"
   null_impact_usd: 20000.0          # impact assumed for qualitative (null-impact) findings
+  max_per_type: 3                   # cap groups of one detector type so reports stay diverse
 
 # ---------------------------------------------------------------------------
 # Tier 1 — detector thresholds.

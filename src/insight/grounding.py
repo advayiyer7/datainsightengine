@@ -12,6 +12,7 @@ matches nothing in the findings is reported.
 
 from __future__ import annotations
 
+import math
 import re
 from dataclasses import dataclass, field
 from typing import Any, Iterable
@@ -86,6 +87,8 @@ def allowed_value_pool(findings: Iterable[Finding]) -> set[float]:
         raw.append(float(f.severity))
     pool: set[float] = set()
     for v in raw:
+        if not math.isfinite(v):  # skip NaN/inf (data can carry NaN metrics)
+            continue
         pool.add(v)
         pool.add(round(v))
         pool.add(round(v, 2))

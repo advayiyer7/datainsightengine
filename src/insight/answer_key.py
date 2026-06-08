@@ -57,6 +57,11 @@ def build_answer_key(
     otherwise all candidates are kept unjudged (validity 2) and ``meta`` says so.
     """
     candidates = run_all(df, _strict_cfg(detector_cfg))
+    # On large datasets the strict detectors can still emit thousands of candidates;
+    # cap the ground-truth set to the highest-severity ones so the judge call is bounded.
+    MAX_CANDIDATES = 60
+    capped = len(candidates) > MAX_CANDIDATES
+    candidates = sorted(candidates, key=lambda f: f.severity, reverse=True)[:MAX_CANDIDATES]
     judged = False
     scores: dict[str, int] = {}
     if client is not None and client.available and candidates:
@@ -90,6 +95,7 @@ def build_answer_key(
         "candidates": len(candidates),
         "kept_valuable": len(entries),
         "dropped_trivial_or_wrong": n_dropped,
+        "candidates_capped_at": MAX_CANDIDATES if capped else None,
     }
     return entries, meta
 

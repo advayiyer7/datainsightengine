@@ -48,6 +48,10 @@ def detect_fragmented_orders(df: pd.DataFrame, params: dict[str, Any]) -> list[F
 
     findings: list[Finding] = []
     g = df.dropna(subset=["order_date"]).sort_values("order_date")
+    # Scale guard: only (supplier,item) groups with >= min_orders rows can qualify.
+    # Pre-filtering keeps the Python group loop to the few interesting groups.
+    sizes = g.groupby(["supplier", "item"])["order_date"].transform("size")
+    g = g[sizes >= min_orders]
     for (supplier, item), grp in g.groupby(["supplier", "item"], sort=False):
         if len(grp) < min_orders:
             continue
@@ -163,12 +167,19 @@ def detect_maverick_price_variance(df: pd.DataFrame, params: dict[str, Any]) -> 
     """
     min_orders = int(params.get("min_orders", 3))
     var_pct = float(params.get("variance_pct", 0.15))
+    max_var = params.get("max_variance_pct")  # None = no upper bound (default)
+    max_var = float(max_var) if max_var is not None else None
     if not _has(df, "item", "supplier", "effective_unit_price", "quantity"):
         return []
 
     findings: list[Finding] = []
-    for item, grp in df.groupby("item", sort=False):
-        sup = grp.dropna(subset=["effective_unit_price"]).groupby("supplier").agg(
+    d = df.dropna(subset=["effective_unit_price"])
+    # Scale guard: an item needs >= 2 suppliers each with >= min_orders, so it needs
+    # at least 2*min_orders rows total. Drop items that can't possibly qualify.
+    isizes = d.groupby("item")["effective_unit_price"].transform("size")
+    d = d[isizes >= 2 * min_orders]
+    for item, grp in d.groupby("item", sort=False):
+        sup = grp.groupby("supplier").agg(
             mean_price=("effective_unit_price", "mean"),
             orders=("effective_unit_price", "size"),
         )
@@ -181,6 +192,11 @@ def detect_maverick_price_variance(df: pd.DataFrame, params: dict[str, Any]) -> 
             continue
         spread = (worst_mean - benchmark) / benchmark
         if spread < var_pct:
+            continue
+        # Upper sanity bound: a spread this large almost always means the rows under
+        # this "item" are not actually the same product (e.g. a generic item name
+        # spanning contracts of wildly different size), not a real overpayment. Skip.
+        if max_var is not None and spread > max_var:
             continue
         best_supplier = sup["mean_price"].idxmin()
         worst_supplier = sup["mean_price"].idxmax()
@@ -277,7 +293,11 @@ def detect_single_source_risk(df: pd.DataFrame, params: dict[str, Any]) -> list[
         return []
 
     findings: list[Finding] = []
-    for item, grp in df.groupby("item", sort=False):
+    d = df.dropna(subset=["total"])
+    # Scale guard: only items whose total spend clears the threshold can qualify.
+    ispend = d.groupby("item")["total"].transform("sum")
+    d = d[ispend >= min_spend]
+    for item, grp in d.groupby("item", sort=False):
         suppliers = grp["supplier"].dropna().unique()
         spend = float(grp["total"].sum())
         if len(suppliers) == 1 and spend >= min_spend:
@@ -394,6 +414,12 @@ def detect_duplicate_order(df: pd.DataFrame, params: dict[str, Any]) -> list[Fin
     findings: list[Finding] = []
     win = np.timedelta64(window_days, "D")
     g = df.dropna(subset=["order_date", "total"]).sort_values("order_date")
+    # Scale guard: drop singleton (supplier,item) groups before the pairwise scan.
+    sizes = g.groupby(["supplier", "item"])["order_date"].transform("size")
+    g = g[sizes >= 2]
+    # Bound the inner look-ahead so a dense group can't blow up to O(n^2); duplicates
+    # are near-in-time, so comparing each order to the next LOOKAHEAD is sufficient.
+    LOOKAHEAD = 200
     for (supplier, item), grp in g.groupby(["supplier", "item"], sort=False):
         if len(grp) < 2:
             continue
@@ -403,7 +429,7 @@ def detect_duplicate_order(df: pd.DataFrame, params: dict[str, Any]) -> list[Fin
         ids = rows["row_id"].tolist()
         n = len(rows)
         for i in range(n):
-            for j in range(i + 1, n):
+            for j in range(i + 1, min(n, i + 1 + LOOKAHEAD)):
                 if (dates[j] - dates[i]) > win:
                     break
                 a, b = totals[i], totals[j]
