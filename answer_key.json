@@ -1,5 +1,13 @@
 {
-  "_README": "Hand-edit this file: set include=false to drop an entry from ground truth, set validity to 0 (wrong) / 1 (trivial) / 2 (valuable). Add your own entries in the same shape. 'key' is type::entities and is used for coverage matching.",
+  "_README": "REVIEW REQUIRED. This key was auto-generated from detectors and filtered by the LLM-judge to keep only insights it scored valuable (2/2). It is NOT yet curated. To make recall meaningful you should: (1) review each entry and set validity 0/1/2 or include=false; (2) ADD insights the fixed detectors cannot catch (set source:\"manual\") \u2014 otherwise detector-based approaches are upper-bounded to ~1.0 recall by construction. Then set curated:true.",
+  "curated": false,
+  "meta": {
+    "curated": false,
+    "judged": true,
+    "candidates": 22,
+    "kept_valuable": 22,
+    "dropped_trivial_or_wrong": 0
+  },
   "entries": [
     {
       "key": "maverick_price_variance::best_supplier=Beta_Supplies|item=Office Supplies|worst_supplier=Alpha_Inc",
@@ -20,7 +28,8 @@
       "est_impact_usd": 2598773.99,
       "one_line": "For Office Supplies, Alpha_Inc averages $60.66/unit vs Beta_Supplies's $50.03 (21% higher); shifting volume to the cheapest supplier could save up to ~$2,598,774.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "maverick_price_variance::best_supplier=Alpha_Inc|item=Packaging|worst_supplier=Epsilon_Group",
@@ -41,7 +50,8 @@
       "est_impact_usd": 2420530.79,
       "one_line": "For Packaging, Epsilon_Group averages $54.53/unit vs Alpha_Inc's $43.60 (25% higher); shifting volume to the cheapest supplier could save up to ~$2,420,531.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "maverick_price_variance::best_supplier=Delta_Logistics|item=Electronics|worst_supplier=Beta_Supplies",
@@ -62,7 +72,8 @@
       "est_impact_usd": 2354746.27,
       "one_line": "For Electronics, Beta_Supplies averages $56.61/unit vs Delta_Logistics's $46.45 (22% higher); shifting volume to the cheapest supplier could save up to ~$2,354,746.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "duplicate_order::item=Electronics|supplier=Beta_Supplies",
@@ -80,7 +91,8 @@
       "est_impact_usd": 165110.34,
       "one_line": "Two near-identical orders to Beta_Supplies for Electronics (~$165,110) placed 3 day(s) apart \u2014 possible duplicate.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "maverick_price_variance::best_supplier=Epsilon_Group|item=Raw Materials|worst_supplier=Alpha_Inc",
@@ -101,7 +113,8 @@
       "est_impact_usd": 2135426.55,
       "one_line": "For Raw Materials, Alpha_Inc averages $63.93/unit vs Epsilon_Group's $48.54 (32% higher); shifting volume to the cheapest supplier could save up to ~$2,135,427.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "tail_spend::",
@@ -117,7 +130,8 @@
       "est_impact_usd": 15600.0,
       "one_line": "156 small orders (each <= $18,175) make up only 3.7% of spend but cost ~$15,600 to process \u2014 consolidation candidate.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Office Supplies|supplier=Delta_Logistics",
@@ -135,7 +149,8 @@
       "est_impact_usd": 1500.0,
       "one_line": "7 separate orders to Delta_Logistics for Office Supplies within 27 days; consolidating could save ~$1,500 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Packaging|supplier=Delta_Logistics",
@@ -153,7 +168,8 @@
       "est_impact_usd": 1250.0,
       "one_line": "6 separate orders to Delta_Logistics for Packaging within 28 days; consolidating could save ~$1,250 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Electronics|supplier=Epsilon_Group",
@@ -171,7 +187,8 @@
       "est_impact_usd": 1250.0,
       "one_line": "6 separate orders to Epsilon_Group for Electronics within 30 days; consolidating could save ~$1,250 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Office Supplies|supplier=Alpha_Inc",
@@ -189,7 +206,8 @@
       "est_impact_usd": 1250.0,
       "one_line": "6 separate orders to Alpha_Inc for Office Supplies within 29 days; consolidating could save ~$1,250 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Office Supplies|supplier=Beta_Supplies",
@@ -207,7 +225,8 @@
       "est_impact_usd": 1250.0,
       "one_line": "6 separate orders to Beta_Supplies for Office Supplies within 27 days; consolidating could save ~$1,250 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Electronics|supplier=Beta_Supplies",
@@ -225,7 +244,8 @@
       "est_impact_usd": 1250.0,
       "one_line": "6 separate orders to Beta_Supplies for Electronics within 27 days; consolidating could save ~$1,250 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Packaging|supplier=Gamma_Co",
@@ -243,7 +263,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Gamma_Co for Packaging within 27 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=MRO|supplier=Epsilon_Group",
@@ -261,7 +282,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Epsilon_Group for MRO within 18 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Electronics|supplier=Gamma_Co",
@@ -279,7 +301,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Gamma_Co for Electronics within 14 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Packaging|supplier=Epsilon_Group",
@@ -297,7 +320,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Epsilon_Group for Packaging within 25 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Office Supplies|supplier=Epsilon_Group",
@@ -315,7 +339,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Epsilon_Group for Office Supplies within 30 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Packaging|supplier=Beta_Supplies",
@@ -333,7 +358,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Beta_Supplies for Packaging within 26 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Raw Materials|supplier=Gamma_Co",
@@ -351,7 +377,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Gamma_Co for Raw Materials within 25 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=MRO|supplier=Alpha_Inc",
@@ -369,7 +396,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Alpha_Inc for MRO within 19 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Office Supplies|supplier=Gamma_Co",
@@ -387,7 +415,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Gamma_Co for Office Supplies within 28 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     },
     {
       "key": "fragmented_orders::item=Raw Materials|supplier=Delta_Logistics",
@@ -405,7 +434,8 @@
       "est_impact_usd": 1000.0,
       "one_line": "5 separate orders to Delta_Logistics for Raw Materials within 21 days; consolidating could save ~$1,000 in shipping/handling.",
       "include": true,
-      "validity": 2
+      "validity": 2,
+      "source": "detector"
     }
   ]
 }

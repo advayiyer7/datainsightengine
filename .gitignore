@@ -16,3 +16,9 @@ venv/
 # OS
 Thumbs.db
 .DS_Store
+
+# Large datasets — too big for GitHub (>100MB limit); keep local only
+data2/
+data2.zip
+data2.csv
+*.csv.zip

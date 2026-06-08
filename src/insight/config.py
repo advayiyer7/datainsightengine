@@ -22,6 +22,15 @@ DEFAULTS: dict[str, Any] = {
         "price_per_mtok_output": 5.0,
         "max_output_tokens": 4096,
     },
+    "narrator": {
+        "top_n": 8,                      # surface only the top-N selected insights
+        # Ranking score for selection. Strategies:
+        #   "severity_x_impact" (default), "impact", "severity".
+        "rank_formula": "severity_x_impact",
+        # Dollar value assumed for findings with no est_impact_usd, so qualitative
+        # risks (concentration, single-source) still rank instead of scoring 0.
+        "null_impact_usd": 20000.0,
+    },
     "detectors": {
         "fragmented_orders": {
             "min_orders": 3,
@@ -63,8 +72,8 @@ DEFAULTS: dict[str, Any] = {
         ),
     },
     "evaluate": {
-        "slices": [0.1, 0.25, 0.5, 1.0],
-        "baseline_max_rows": 400,
+        "slices": [0.05, 0.1, 0.25, 0.5, 1.0],
+        "baseline_max_rows": 1500,
     },
 }
 

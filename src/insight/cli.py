@@ -86,17 +86,28 @@ def cmd_run(args) -> int:
         Path("agentic_log.json").write_text(json.dumps(ag.to_dict(), indent=2, default=str), encoding="utf-8")
         findings = findings + ag.findings
 
-    narr = narrate(findings, client, top=12)
+    ncfg = cfg.get("narrator", {})
+    narr = narrate(
+        findings, client,
+        top_n=int(ncfg.get("top_n", 8)),
+        rank_formula=ncfg.get("rank_formula", "severity_x_impact"),
+        null_impact_usd=float(ncfg.get("null_impact_usd", 20000.0)),
+    )
+    # The FULL finding set is persisted to findings.json; the report is the selected top-N.
+    Path("findings.json").write_text(findings_to_json(findings), encoding="utf-8")
     Path("insights.md").write_text(narr.markdown, encoding="utf-8")
     Path("insights.json").write_text(
         json.dumps({"findings": [f.to_dict() for f in findings], "report": narr.to_dict()},
                    indent=2, default=str),
         encoding="utf-8",
     )
-    print(f"\nWrote insights.md and insights.json ({len(narr.insights)} insights from {len(findings)} findings).")
+    print(f"\nWrote findings.json ({len(findings)} findings), insights.md and insights.json "
+          f"({len(narr.insights)} selected insights).")
     g = narr.grounding
-    status = "all grounded" if g.ok else f"{len(g.unmatched)} UNGROUNDED figure(s)!"
+    status = "all grounded" if g.ok else f"{len(g.unmatched)} ungrounded after repair"
     print(f"Grounding guard: {g.matched}/{g.total_numbers} numbers traced to findings — {status}")
+    print(f"Spurious-number rate: {narr.spurious_rate_before:.0%} before repair -> "
+          f"{narr.spurious_rate_after:.0%} after.")
     if not g.ok:
         for u in g.unmatched:
             print(f"  ungrounded: {u['text']} ({u['value']})")
@@ -108,11 +119,18 @@ def cmd_run(args) -> int:
 
 def cmd_make_answer_key(args) -> int:
     cfg, df, sm, rep = _load(args)
-    entries = build_answer_key(df, cfg.get("detectors", {}))
+    client = LLMClient(cfg=cfg.get("llm", {}))
+    if not client.available:
+        print("(note: ANTHROPIC_API_KEY not set — candidates kept unjudged; set a key to judge-filter)")
+    entries, meta = build_answer_key(df, cfg.get("detectors", {}), client)
     out = args.output or "answer_key.json"
-    write_answer_key(entries, out)
+    write_answer_key(entries, out, meta)
     print(f"Wrote {len(entries)} ground-truth entries -> {out}")
-    print("Hand-edit it: set include=false to drop, validity 0/1/2, or add your own entries.")
+    if meta.get("judged"):
+        print(f"Judge kept {meta['kept_valuable']} valuable / dropped "
+              f"{meta['dropped_trivial_or_wrong']} trivial-or-wrong of {meta['candidates']} candidates.")
+    print("REVIEW REQUIRED: edit validity/include and ADD non-detector insights (source:\"manual\"), "
+          "then set curated:true — otherwise detector recall is upper-bounded by construction.")
     from collections import Counter
     for t, n in Counter(e["type"] for e in entries).most_common():
         print(f"  {t:<26} {n}")
@@ -127,18 +145,19 @@ def cmd_evaluate(args) -> int:
         slices = [float(x) for x in args.slices.split(",") if x.strip()]
 
     gold = None
+    gold_curated = False
     key_path = args.answer_key or "answer_key.json"
     if Path(key_path).exists():
-        gold = load_answer_key(key_path)
-        print(f"Using hand-editable answer key: {key_path} ({len(gold)} entries)")
+        gold, gold_curated = load_answer_key(key_path)
+        print(f"Using answer key: {key_path} ({len(gold)} entries, curated={gold_curated})")
     else:
-        print(f"No {key_path} found — using an auto-generated strict-threshold answer key.")
+        print(f"No {key_path} found — generating an in-memory judge-curated key for this run.")
 
     client = LLMClient(cfg=cfg.get("llm", {}))
     if not client.available:
         print("(note: ANTHROPIC_API_KEY not set — B0/SYS/FULL run in fallback; LLM costs read $0)")
 
-    out = run_evaluation(df, cfg, gold=gold, out_dir=args.out_dir,
+    out = run_evaluation(df, cfg, gold=gold, gold_curated=gold_curated, out_dir=args.out_dir,
                          slices=slices, run_agentic=not args.no_agentic)
     print(f"\nWrote {args.out_dir}/results_quality.csv, results_scaling.csv, RESULTS.md"
           + (f", {Path(out.chart_path).name}" if out.chart_path else " (chart skipped)"))

@@ -103,13 +103,26 @@ It reports, into `eval_out/`:
 - **`RESULTS.md`** — an auto-written summary that states whether the run
   **supported or broke** the hypothesis, plus honest caveats.
 
-### Ground truth
+### Ground truth (and the recall caveat)
 
-`insight make-answer-key` runs the detectors at **strict** thresholds and writes
-`answer_key.json` — a high-confidence insight set you can **hand-edit** (toggle
-`include`, set `validity` 0/1/2, add your own entries). `evaluate` scores each
-approach's recall against it. If no answer key exists, `evaluate` auto-generates
-one in memory and says so.
+`insight make-answer-key` runs the detectors at **strict** thresholds, then runs the
+**LLM-judge** and keeps only candidates scored *valuable* (2/2), writing them to
+`answer_key.json` with `curated: false`. Review it, set `validity`/`include`, and —
+crucially — **add insights the detectors cannot catch** (`source: "manual"`), then
+set `curated: true`.
+
+Why this matters: because the key is built from the engine's own detectors, recall
+for detector-based approaches (B1/SYS/FULL) is **upper-bounded near 1.0 by
+construction**. That is *not* a clean win over B0 — `evaluate` says so explicitly in
+`RESULTS.md`. Recall only becomes a fair test once you add non-detector insights.
+
+### Selection (top-N)
+
+The narrator does **not** pass through every finding. It merges findings about the
+same subject, ranks them by a configurable business-impact score
+(`narrator.rank_formula`, default `severity × est_impact_usd`), and narrates only the
+top `narrator.top_n` (default 8). The full finding set still lands in `findings.json`;
+the report and the SYS/FULL numbers the evaluator scores are the selected top-N.
 
 ## How to read the results
 

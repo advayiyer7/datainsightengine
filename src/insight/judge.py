@@ -31,6 +31,7 @@ class JudgeResult:
     scores: list[int] = field(default_factory=list)
     rationales: list[str] = field(default_factory=list)
     used_llm: bool = False
+    by_key: dict[str, int] = field(default_factory=dict)  # finding.key() -> score
 
     @property
     def mean_score(self) -> float:
@@ -78,8 +79,10 @@ def judge_findings(
         ]
         prompt = "Findings to score:\n" + json.dumps(payload, default=str)
         try:
+            # Scale output budget to the number of findings (one score object each).
+            jt = min(4096, 400 + 80 * len(ranked))
             raw = client.complete(prompt, system=SYSTEM, model=client.cfg.get("narrator_model"),
-                                  max_tokens=1500)
+                                  max_tokens=jt)
             data = _extract_json(raw)
             by_idx = {int(s["index"]): s for s in data.get("scores", [])}
             scores, whys = [], []
@@ -87,10 +90,13 @@ def judge_findings(
                 s = by_idx.get(i, {})
                 scores.append(int(max(0, min(2, s.get("score", 1)))))
                 whys.append(str(s.get("why", "")))
-            return JudgeResult(scores=scores, rationales=whys, used_llm=True)
+            by_key = {ranked[i].key(): scores[i] for i in range(len(ranked))}
+            return JudgeResult(scores=scores, rationales=whys, used_llm=True, by_key=by_key)
         except Exception:
             pass  # fall through to non-LLM scoring
 
     fallback_scores = fallback_scores or {}
     scores = [int(fallback_scores.get(f.key(), 1)) for f in ranked]
-    return JudgeResult(scores=scores, rationales=["(no LLM; fallback label)"] * len(scores), used_llm=False)
+    by_key = {ranked[i].key(): scores[i] for i in range(len(ranked))}
+    return JudgeResult(scores=scores, rationales=["(no LLM; fallback label)"] * len(scores),
+                       used_llm=False, by_key=by_key)

@@ -112,7 +112,7 @@ class EvalOutput:
     quality_rows: list[dict[str, Any]]
     scaling_rows: list[dict[str, Any]]
     gold_total: int
-    gold_hand_edited: bool
+    gold_curated: bool
     chart_path: str | None
     results_md: str
 
@@ -122,6 +122,7 @@ def run_evaluation(
     cfg: dict[str, Any],
     *,
     gold: list[dict[str, Any]] | None,
+    gold_curated: bool = False,
     out_dir: str | Path,
     slices: list[float] | None = None,
     run_agentic: bool = True,
@@ -130,14 +131,22 @@ def run_evaluation(
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
     detector_cfg = cfg.get("detectors", {})
-    slices = slices or cfg.get("evaluate", {}).get("slices", [0.1, 0.25, 0.5, 1.0])
-    gold_hand_edited = gold is not None
-    if gold is None:
-        gold = build_answer_key(df, detector_cfg)  # in-memory default, not hand-edited
-    gold_scores = {g["key"]: int(g.get("validity", 2)) for g in gold}
+    ncfg = cfg.get("narrator", {})
+    slices = slices or cfg.get("evaluate", {}).get("slices", [0.05, 0.1, 0.25, 0.5, 1.0])
 
     probe = _new_client(cfg)
     llm_available = probe.available
+
+    gold_loaded = gold is not None
+    if gold is None:
+        gold, _meta = build_answer_key(df, detector_cfg, probe)  # judge-curated in memory
+    gold_scores = {g["key"]: int(g.get("validity", 2)) for g in gold}
+
+    def _narrate(client: LLMClient, findings: list[Finding]):
+        return narrate(findings, client,
+                       top_n=int(ncfg.get("top_n", 8)),
+                       rank_formula=ncfg.get("rank_formula", "severity_x_impact"),
+                       null_impact_usd=float(ncfg.get("null_impact_usd", 20000.0)))
 
     # --- cost scaling across slices (B0 vs B1 vs SYS) ---
     scaling_rows: list[dict[str, Any]] = []
@@ -146,7 +155,7 @@ def run_evaluation(
         b1 = run_all(sl, detector_cfg)
 
         sys_client = _new_client(cfg)
-        narrate(b1, sys_client, top=12)
+        _narrate(sys_client, b1)
 
         b0_client = _new_client(cfg)
         b0 = dump_to_llm(sl, b0_client, cfg)
@@ -168,31 +177,35 @@ def run_evaluation(
     full = df
     results: list[ApproachResult] = []
 
-    # B1
+    # B1 — ALL raw detector findings (the no-selection baseline for contrast).
+    # Judge ALL of them (not just top-15) so precision reflects the whole dump,
+    # including the low-value tail that selection is meant to drop.
     t = time.monotonic()
     b1 = run_all(full, detector_cfg)
     b1_rt = time.monotonic() - t
-    j = judge_findings(b1, _new_client(cfg), fallback_scores=gold_scores)
+    j = judge_findings(b1, _new_client(cfg), max_judged=max(1, len(b1)), fallback_scores=gold_scores)
     r, hit, tot = coverage(b1, gold)
-    res_b1 = ApproachResult("B1 detectors", len(b1), r, hit, tot, j.mean_score, j.valuable_fraction,
-                            Usage(), b1_rt, "no LLM" + ("" if j.used_llm else "; validity=fallback labels"))
+    res_b1 = ApproachResult("B1 detectors (all)", len(b1), r, hit, tot, j.mean_score, j.valuable_fraction,
+                            Usage(), b1_rt, "no LLM; all raw findings, no selection")
     results.append(res_b1)
 
-    # SYS = detectors + narrator
+    # SYS — detectors + narrator, scored on the NARRATED TOP-N SELECTION (not all findings).
     t = time.monotonic()
     sys_client = _new_client(cfg)
-    narr = narrate(b1, sys_client, top=12)
+    narr = _narrate(sys_client, b1)
     sys_rt = time.monotonic() - t
-    j = judge_findings(b1, _new_client(cfg), fallback_scores=gold_scores)
-    r, hit, tot = coverage(b1, gold)
-    sys_note = ("narrator " + ("LLM" if narr.used_llm else "fallback")
-                + f"; grounding {narr.grounding.matched}/{narr.grounding.total_numbers}"
-                + ("" if narr.grounding.ok else " (UNGROUNDED!)"))
-    res_sys = ApproachResult("SYS det+narrator", len(b1), r, hit, tot, j.mean_score, j.valuable_fraction,
-                             sys_client.usage, sys_rt, sys_note)
+    # Recall on all referenced findings (generous); precision on one headline per insight.
+    j = judge_findings(narr.representatives, _new_client(cfg),
+                       max_judged=max(1, len(narr.representatives)), fallback_scores=gold_scores)
+    r, hit, tot = coverage(narr.selected, gold)
+    sys_note = (f"narrator {'LLM' if narr.used_llm else 'fallback'}; top-{len(narr.insights)} insights; "
+                f"spurious {narr.spurious_rate_before:.0%}->{narr.spurious_rate_after:.0%}; "
+                f"grounding {narr.grounding.matched}/{narr.grounding.total_numbers}")
+    res_sys = ApproachResult("SYS det+narrator", len(narr.insights), r, hit, tot, j.mean_score,
+                             j.valuable_fraction, sys_client.usage, sys_rt, sys_note)
     results.append(res_sys)
 
-    # B0
+    # B0 — dump-to-LLM.
     t = time.monotonic()
     b0_client = _new_client(cfg)
     b0 = dump_to_llm(full, b0_client, cfg)
@@ -203,24 +216,28 @@ def run_evaluation(
                             b0_client.usage, b0_rt, b0.note or "")
     results.append(res_b0)
 
-    # FULL = SYS + agentic
-    full_findings = list(b1)
+    # FULL — detectors + agentic, narrated and scored on its OWN top-N selection.
     agentic_note = ""
     full_usage = Usage(price_per_mtok_input=sys_client.usage.price_per_mtok_input,
                        price_per_mtok_output=sys_client.usage.price_per_mtok_output)
-    full_usage.merge(sys_client.usage)
     t = time.monotonic()
+    candidate_pool = list(b1)
     if run_agentic:
         ag_client = _new_client(cfg)
         ag = discover(full, ag_client, cfg.get("agentic", {}))
-        full_findings = list(b1) + list(ag.findings)
+        candidate_pool = list(b1) + list(ag.findings)
         full_usage.merge(ag_client.usage)
-        agentic_note = f"agent: {ag.stopped_reason}, +{len(ag.findings)} findings"
-    full_rt = sys_rt + (time.monotonic() - t)
-    j = judge_findings(full_findings, _new_client(cfg), fallback_scores=gold_scores)
-    r, hit, tot = coverage(full_findings, gold)
-    res_full = ApproachResult("FULL +agentic", len(full_findings), r, hit, tot, j.mean_score,
-                              j.valuable_fraction, full_usage, full_rt, agentic_note)
+        agentic_note = f"agent: {ag.stopped_reason}, +{len(ag.findings)} candidates"
+    full_client = _new_client(cfg)
+    narr_full = _narrate(full_client, candidate_pool)
+    full_usage.merge(full_client.usage)
+    full_rt = time.monotonic() - t
+    j = judge_findings(narr_full.representatives, _new_client(cfg),
+                       max_judged=max(1, len(narr_full.representatives)), fallback_scores=gold_scores)
+    r, hit, tot = coverage(narr_full.selected, gold)
+    res_full = ApproachResult("FULL +agentic", len(narr_full.insights), r, hit, tot, j.mean_score,
+                              j.valuable_fraction, full_usage, full_rt,
+                              agentic_note + f"; top-{len(narr_full.insights)} insights")
     results.append(res_full)
 
     # --- write artifacts ---
@@ -229,9 +246,9 @@ def run_evaluation(
     pd.DataFrame(scaling_rows).to_csv(out_dir / "results_scaling.csv", index=False)
 
     chart_path = _make_chart(quality_rows, scaling_rows, out_dir, llm_available)
-    results_md = _write_results_md(quality_rows, scaling_rows, gold, gold_hand_edited,
+    results_md = _write_results_md(quality_rows, scaling_rows, gold, gold_loaded, gold_curated,
                                    llm_available, narr, out_dir, chart_path)
-    return EvalOutput(quality_rows, scaling_rows, len(gold), gold_hand_edited, chart_path, results_md)
+    return EvalOutput(quality_rows, scaling_rows, len(gold), gold_curated, chart_path, results_md)
 
 
 # ---------------------------------------------------------------------------
@@ -289,7 +306,7 @@ def _md_table(rows: list[dict[str, Any]], cols: list[str]) -> str:
     return "\n".join([header, sep, *body])
 
 
-def _write_results_md(quality_rows, scaling_rows, gold, gold_hand_edited, llm_available,
+def _write_results_md(quality_rows, scaling_rows, gold, gold_loaded, gold_curated, llm_available,
                       narr, out_dir: Path, chart_path) -> str:
     lines: list[str] = []
     lines.append("# RESULTS — Procurement Insight Engine evaluation\n")
@@ -311,10 +328,17 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_hand_edited, llm_av
     qcols = ["approach", "n_findings", "recall", "validity_mean_0_2", "validity_valuable_frac",
              "total_tokens", "est_usd", "runtime_s"]
     lines.append(_md_table(quality_rows, qcols) + "\n")
-    lines.append(f"_Coverage measured against {len(gold)} ground-truth entries "
-                 + ("(loaded from answer_key.json — hand-edit it to refine)."
-                    if gold_hand_edited
-                    else "(auto-generated strict-threshold key, in-memory; run make-answer-key to hand-edit).") + "_\n")
+    src = ("loaded from answer_key.json" if gold_loaded else "judge-curated in memory for this run")
+    lines.append(f"_Coverage measured against {len(gold)} **judge-curated, valuable-only** ground-truth "
+                 f"entries ({src}; curated={gold_curated})._\n")
+    lines.append(
+        "> ⚠ **Recall caveat (read before trusting recall):** the ground-truth set is built from the "
+        "engine's OWN detectors (then filtered by the judge to valuable-only). It therefore contains "
+        "only insights the detectors can produce, so detector-based approaches (B1/SYS/FULL) have their "
+        "recall **upper-bounded near 1.0 by construction**. This is NOT a clean win over B0. To make "
+        "recall a fair test, a human must add insights the detectors *cannot* catch (`source:\"manual\"` "
+        "in answer_key.json) and set `curated:true`"
+        + ("." if gold_curated else " — which has NOT yet been done for this key.") + "\n")
 
     lines.append("## Cost scaling vs data size\n")
     scols = ["slice", "rows", "B0_est_usd", "SYS_est_usd", "B1_est_usd", "B0_findings", "B1_findings"]
@@ -322,12 +346,19 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_hand_edited, llm_av
 
     # Interpretation.
     q = {r["approach"]: r for r in quality_rows}
-    sys_cost = q.get("SYS det+narrator", {}).get("est_usd", 0.0)
-    b0_cost = q.get("B0 dump-to-LLM", {}).get("est_usd", 0.0)
-    sys_recall = q.get("SYS det+narrator", {}).get("recall", 0.0)
-    b0_recall = q.get("B0 dump-to-LLM", {}).get("recall", 0.0)
-    sys_prec = q.get("SYS det+narrator", {}).get("validity_mean_0_2", 0.0)
-    b0_prec = q.get("B0 dump-to-LLM", {}).get("validity_mean_0_2", 0.0)
+    b1 = q.get("B1 detectors (all)", {})
+    sysr = q.get("SYS det+narrator", {})
+    b0r = q.get("B0 dump-to-LLM", {})
+    sys_cost = sysr.get("est_usd", 0.0)
+    b0_cost = b0r.get("est_usd", 0.0)
+    sys_recall = sysr.get("recall", 0.0)
+    b0_recall = b0r.get("recall", 0.0)
+    sys_prec = sysr.get("validity_mean_0_2", 0.0)
+    b0_prec = b0r.get("validity_mean_0_2", 0.0)
+    b1_prec = b1.get("validity_mean_0_2", 0.0)
+    sys_n = sysr.get("n_findings", 0)
+    b1_n = b1.get("n_findings", 0)
+    b0_n = b0r.get("n_findings", 0)
     sc = pd.DataFrame(scaling_rows).sort_values("rows")
     b0_growth = (sc["B0_est_usd"].iloc[-1] - sc["B0_est_usd"].iloc[0]) if len(sc) > 1 else 0.0
     sys_growth = (sc["SYS_est_usd"].iloc[-1] - sc["SYS_est_usd"].iloc[0]) if len(sc) > 1 else 0.0
@@ -337,25 +368,48 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_hand_edited, llm_av
         verdict = []
         cheaper = b0_cost > sys_cost * 1.5
         comparable_quality = sys_recall >= b0_recall - 0.1
+        delta = sys_prec - b1_prec
+        if delta > 0.05:
+            sel_msg = (f"per-finding validity rose from B1 {b1_prec:.2f} to SYS {sys_prec:.2f} — "
+                       "merging + top-N ranking lifts quality over the raw dump.")
+        elif abs(delta) <= 0.1:
+            sel_msg = (f"per-finding validity is comparable (B1 {b1_prec:.2f} vs SYS {sys_prec:.2f}); on "
+                       "this dataset the detector output is fairly uniform in quality, so selection's win "
+                       "is **fewer, focused insights at low cost** rather than higher per-item validity. A "
+                       "noisier dataset with a longer low-value tail would show a larger precision gain.")
+        else:
+            sel_msg = (f"per-finding validity dipped (B1 {b1_prec:.2f} -> SYS {sys_prec:.2f}): the "
+                       "impact-ranked top-N favors high-dollar findings the judge treats as upper-bound "
+                       "estimates. Tune `narrator.rank_formula` if you prefer the judge's notion of value.")
         verdict.append(
-            f"- **Cost:** SYS cost ${sys_cost:.4f} vs B0 ${b0_cost:.4f} at full data "
+            f"- **Selection:** SYS narrates **{sys_n} insights** (down from B1's {b1_n} raw findings); "
+            + sel_msg)
+        if narr.spurious_before == 0:
+            verdict.append(
+                f"- **Spurious numbers:** the narrator produced **0 untraceable figures** out of "
+                f"{narr.total_numbers} cited — the tightened 'verbatim numbers only' prompt prevented "
+                "fabrication, so the per-insight repair was not needed.")
+        else:
+            verdict.append(
+                f"- **Spurious numbers:** untraceable-figure rate fell from "
+                f"{narr.spurious_rate_before:.0%} to **{narr.spurious_rate_after:.0%}** after the "
+                f"per-insight grounding repair ({narr.total_numbers} numbers cited).")
+        verdict.append(
+            f"- **Cost:** SYS ${sys_cost:.4f} vs B0 ${b0_cost:.4f} at full data "
             + ("— SYS is materially cheaper. " if cheaper else "— costs were close. "))
         verdict.append(
             f"- **Cost scaling:** as rows grew, B0 cost rose by ${b0_growth:.4f} while SYS rose by "
             f"${sys_growth:.4f} — " + ("SYS stays ~flat, B0 climbs (thesis supported)."
                                        if b0_growth > sys_growth else "scaling was inconclusive here."))
         verdict.append(
-            f"- **Quality — recall:** SYS {sys_recall:.2f} vs B0 {b0_recall:.2f} — "
-            + ("SYS matches or beats B0 on coverage (thesis supported)." if comparable_quality
-               else "B0 led on recall here."))
-        prec_gap = b0_prec - sys_prec
+            f"- **Quality — recall:** SYS {sys_recall:.2f} vs B0 {b0_recall:.2f} (see the recall caveat "
+            "above — this is bounded by construction, not a clean win).")
         verdict.append(
-            f"- **Quality — precision (LLM-judge 0–2):** B0 {b0_prec:.2f} vs SYS {sys_prec:.2f}. "
-            + ("B0's surfaced insights score higher per-finding — it returns fewer, punchier items, "
-               "while the detector dump includes many low-severity findings the judge rates trivial. "
-               "Net: detectors win recall + cost, B0 wins per-item precision; narrating only the top-N "
-               "detector findings would close the precision gap." if prec_gap > 0.1
-               else "precision is comparable across approaches."))
+            f"- **Quality — precision (LLM-judge 0–2):** SYS {sys_prec:.2f} ({sys_n} insights) vs "
+            f"B0 {b0_prec:.2f} ({b0_n} insights). "
+            + ("SYS now matches or beats B0 on per-finding validity while keeping recall + low cost."
+               if sys_prec >= b0_prec - 0.05
+               else "B0 still edges per-finding validity; SYS wins on recall + cost."))
         if narr.grounding.ok:
             verdict.append(
                 f"- **Grounding:** narrator cited {narr.grounding.matched}/{narr.grounding.total_numbers} "
@@ -374,10 +428,9 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_hand_edited, llm_av
         lines.extend(verdict)
     else:
         lines.append(
-            "- With no API key, the deterministic tiers ran fully: detectors produced "
-            f"{q.get('B1 detectors',{}).get('n_findings',0)} findings with recall "
-            f"{q.get('B1 detectors',{}).get('recall',0):.2f} against the answer key, and the narrator "
-            f"grounding guard verified {narr.grounding.matched}/{narr.grounding.total_numbers} cited numbers.")
+            "- With no API key, the deterministic tiers ran fully: B1 produced "
+            f"{b1.get('n_findings',0)} raw findings; SYS selected the top {sysr.get('n_findings',0)}; "
+            f"the grounding guard verified {narr.grounding.matched}/{narr.grounding.total_numbers} cited numbers.")
         lines.append("- The cost-scaling and B0-vs-SYS quality comparison need a key to be meaningful; "
                      "set `ANTHROPIC_API_KEY` and re-run `insight evaluate` to fill them in.")
 

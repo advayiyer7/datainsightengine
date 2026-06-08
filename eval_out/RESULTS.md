@@ -8,29 +8,34 @@ _Most valuable procurement insights are computable patterns, not open-ended reas
 
 | approach | n_findings | recall | validity_mean_0_2 | validity_valuable_frac | total_tokens | est_usd | runtime_s |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| B1 detectors | 32 | 1.0 | 1.4 | 0.4 | 0 | 0.0 | 0.203 |
-| SYS det+narrator | 32 | 1.0 | 1.4 | 0.4 | 11196 | 0.02024 | 20.469 |
-| B0 dump-to-LLM | 7 | 0.273 | 1.714 | 0.714 | 19782 | 0.028978 | 19.484 |
-| FULL +agentic | 34 | 1.0 | 1.533 | 0.533 | 24483 | 0.045887 | 50.922 |
+| B1 detectors (all) | 32 | 1.0 | 1.719 | 0.719 | 0 | 0.0 | 0.297 |
+| SYS det+narrator | 8 | 1.0 | 1.625 | 0.625 | 4233 | 0.010997 | 13.515 |
+| B0 dump-to-LLM | 8 | 0.318 | 1.625 | 0.625 | 36194 | 0.04551 | 19.953 |
+| FULL +agentic | 8 | 1.0 | 1.75 | 0.75 | 18057 | 0.039745 | 48.735 |
 
-_Coverage measured against 22 ground-truth entries (loaded from answer_key.json — hand-edit it to refine)._
+_Coverage measured against 22 **judge-curated, valuable-only** ground-truth entries (loaded from answer_key.json; curated=False)._
+
+> ⚠ **Recall caveat (read before trusting recall):** the ground-truth set is built from the engine's OWN detectors (then filtered by the judge to valuable-only). It therefore contains only insights the detectors can produce, so detector-based approaches (B1/SYS/FULL) have their recall **upper-bounded near 1.0 by construction**. This is NOT a clean win over B0. To make recall a fair test, a human must add insights the detectors *cannot* catch (`source:"manual"` in answer_key.json) and set `curated:true` — which has NOT yet been done for this key.
 
 ## Cost scaling vs data size
 
 | slice | rows | B0_est_usd | SYS_est_usd | B1_est_usd | B0_findings | B1_findings |
 | --- | --- | --- | --- | --- | --- | --- |
-| 0.1 | 78 | 0.013528 | 0.01523 | 0.0 | 7 | 16 |
-| 0.25 | 194 | 0.019924 | 0.017556 | 0.0 | 7 | 26 |
-| 0.5 | 388 | 0.028824 | 0.018089 | 0.0 | 8 | 33 |
-| 1.0 | 777 | 0.029918 | 0.020925 | 0.0 | 7 | 32 |
+| 0.05 | 39 | 0.011798 | 0.019846 | 0.0 | 7 | 8 |
+| 0.1 | 78 | 0.016108 | 0.010912 | 0.0 | 8 | 16 |
+| 0.25 | 194 | 0.023674 | 0.011743 | 0.0 | 8 | 26 |
+| 0.5 | 388 | 0.027809 | 0.010965 | 0.0 | 7 | 33 |
+| 1.0 | 777 | 0.04728 | 0.010802 | 0.0 | 7 | 32 |
 
 ## What the run showed
 
-- **Cost:** SYS cost $0.0202 vs B0 $0.0290 at full data — costs were close. 
-- **Cost scaling:** as rows grew, B0 cost rose by $0.0164 while SYS rose by $0.0057 — SYS stays ~flat, B0 climbs (thesis supported).
-- **Quality — recall:** SYS 1.00 vs B0 0.27 — SYS matches or beats B0 on coverage (thesis supported).
-- **Quality — precision (LLM-judge 0–2):** B0 1.71 vs SYS 1.40. B0's surfaced insights score higher per-finding — it returns fewer, punchier items, while the detector dump includes many low-severity findings the judge rates trivial. Net: detectors win recall + cost, B0 wins per-item precision; narrating only the top-N detector findings would close the precision gap.
-- **Grounding:** narrator cited 45/56 numbers traceable to findings — SOME UNGROUNDED.
+- **Selection:** SYS narrates **8 insights** (down from B1's 32 raw findings); per-finding validity is comparable (B1 1.72 vs SYS 1.62); on this dataset the detector output is fairly uniform in quality, so selection's win is **fewer, focused insights at low cost** rather than higher per-item validity. A noisier dataset with a longer low-value tail would show a larger precision gain.
+- **Spurious numbers:** the narrator produced **0 untraceable figures** out of 81 cited — the tightened 'verbatim numbers only' prompt prevented fabrication, so the per-insight repair was not needed.
+- **Cost:** SYS $0.0110 vs B0 $0.0455 at full data — SYS is materially cheaper. 
+- **Cost scaling:** as rows grew, B0 cost rose by $0.0355 while SYS rose by $-0.0090 — SYS stays ~flat, B0 climbs (thesis supported).
+- **Quality — recall:** SYS 1.00 vs B0 0.32 (see the recall caveat above — this is bounded by construction, not a clean win).
+- **Quality — precision (LLM-judge 0–2):** SYS 1.62 (8 insights) vs B0 1.62 (8 insights). SYS now matches or beats B0 on per-finding validity while keeping recall + low cost.
+- **Grounding:** narrator cited 81/81 numbers, all traceable to findings — no fabrication.
 
 **Verdict:** the hypothesis is **SUPPORTED** by this run.
 

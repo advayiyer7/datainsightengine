@@ -898,273 +898,106 @@
       "est_impact_usd": 500.0,
       "one_line": "3 separate orders to Beta_Supplies for MRO within 22 days; consolidating could save ~$500 in shipping/handling.",
       "source": "detector"
-    },
-    {
-      "type": "High-Defect-Rate Orders Marked Compliant",
-      "severity": 0.92,
-      "entities": {
-        "primary_supplier": "Delta_Logistics",
-        "affected_categories": [
-          "Raw Materials",
-          "Electronics",
-          "MRO",
-          "Packaging"
-        ],
-        "compliance_status": "Yes (but high defects)"
-      },
-      "metrics": {
-        "total_defect_cost_in_compliant_orders": 913236.58,
-        "count_high_defect_compliant_orders": 125,
-        "avg_defect_rate_in_compliant": 0.128,
-        "top_single_order_defect_cost": 28249.76,
-        "defect_rate_range": "0.10 to 0.16"
-      },
-      "evidence": {
-        "observation": "125 orders marked 'compliance=Yes' contain defect rates of 10-16%, generating $913k in hidden quality costs. Delta_Logistics dominates this list with 4 of top 5 worst offenders (defect rates 13-16%). These orders passed compliance checks despite substantial material waste.",
-        "root_cause": "Compliance field appears to track documentation/paperwork only, not actual quality performance. High-defect orders are not flagged for supplier review or price adjustment.",
-        "example_order": "Delta_Logistics Raw Materials order (2022-06-30): 1,958 units, 308 defective (15.7% defect rate), marked compliant, cost of defects = $28,250"
-      },
-      "est_impact_usd": 913236.58,
-      "one_line": "125 'compliant' orders with 10-16% defect rates (mostly Delta_Logistics) hide $913k in avoidable quality costs\u2014compliance field doesn't track actual quality.",
-      "source": "agent"
-    },
-    {
-      "type": "Negotiation Savings Left on Table",
-      "severity": 0.88,
-      "entities": {
-        "top_suppliers_with_gaps": [
-          "Alpha_Inc",
-          "Beta_Supplies",
-          "Delta_Logistics"
-        ],
-        "affected_items": [
-          "Packaging",
-          "Office Supplies",
-          "Electronics",
-          "Raw Materials"
-        ]
-      },
-      "metrics": {
-        "top_10_orders_potential_savings": 163394.85,
-        "largest_single_gap": 23017.61,
-        "avg_savings_per_top_order": 16339.49,
-        "count_orders_with_negotiated_discount": 777
-      },
-      "evidence": {
-        "observation": "Top 10 orders show negotiated prices 10-15% below list price, but pattern analysis suggests inconsistent negotiation leverage. Alpha_Inc Packaging order (2023-08-02): list $99.04 vs negotiated $86.51 = $23k savings on 1,837 units. Similar items from same supplier in other periods show smaller discounts, indicating negotiation power not consistently applied.",
-        "root_cause": "Procurement may lack systematic contract leverage or fail to apply best-achieved rates across repeat purchases from same supplier.",
-        "example_order": "Alpha_Inc Packaging (2023-08-02): 1,837 qty \u00d7 ($99.04 - $86.51) = $23,017.61 potential savings realized, but other packaging orders from Alpha_Inc show weaker discounts"
-      },
-      "est_impact_usd": 163394.85,
-      "one_line": "Top 10 orders show $163k in negotiated savings, but inconsistent discount application across repeat supplier-item pairs suggests $50k+ annual savings left on table.",
-      "source": "agent"
-    },
-    {
-      "type": "Non-Compliance Spend Concentration Risk",
-      "severity": 0.85,
-      "entities": {
-        "non_compliant_order_count": 137,
-        "top_offender": "Gamma_Co",
-        "secondary_offender": "Beta_Supplies"
-      },
-      "metrics": {
-        "total_non_compliant_spend": 6986051.38,
-        "avg_non_compliant_order_value": 50993.08,
-        "non_compliant_orders_pct_of_total": 0.176,
-        "top_non_compliant_order_value": 171854.32
-      },
-      "evidence": {
-        "observation": "137 orders (17.6% of dataset) marked 'compliance=No' total $6.99M spend. Gamma_Co dominates with 5 of top 6 non-compliant orders (each >$150k). These orders still delivered and were paid, indicating compliance flag is post-hoc or non-blocking.",
-        "root_cause": "Non-compliance does not prevent order fulfillment or payment, suggesting compliance is a documentation/audit flag rather than a procurement control. No evidence of price adjustment, return, or supplier penalty.",
-        "example_order": "Gamma_Co Packaging (2023-06-02): $171,854 order marked non-compliant, 108 defective units, but still accepted and paid"
-      },
-      "est_impact_usd": 6986051.38,
-      "one_line": "$6.99M in non-compliant orders (137 orders, 17.6% of spend) accepted without apparent penalty or rework\u2014Gamma_Co concentration risk.",
-      "source": "agent"
     }
   ],
   "report": {
     "used_llm": true,
+    "n_selected_findings": 14,
     "grounding": {
-      "ok": false,
-      "total_numbers": 55,
-      "matched": 54,
-      "unmatched": [
-        {
-          "text": "$150k",
-          "value": 150000.0,
-          "kind": "dollar"
-        }
-      ]
+      "ok": true,
+      "total_numbers": 75,
+      "matched": 75,
+      "unmatched": []
     },
+    "spurious_before": 0,
+    "spurious_after": 0,
+    "total_numbers": 75,
+    "spurious_rate_after": 0.0,
     "insights": [
       {
-        "title": "Office Supplies Price Variance with Alpha_Inc",
-        "what": "Alpha_Inc charges $60.66/unit for Office Supplies vs. best supplier Beta_Supplies at $50.03/unit\u2014a 21.2% premium across 174 orders.",
-        "why": "Maverick pricing: volume concentrated with higher-cost supplier instead of best-price vendor. Shifting to cheapest supplier could eliminate overpayment.",
-        "action": "Consolidate Office Supplies volume to Beta_Supplies; renegotiate Alpha_Inc pricing or reduce order frequency.",
+        "title": "Office Supplies: Consolidate to Beta_Supplies to Eliminate 21% Price Premium",
+        "what": "Alpha_Inc charges $60.66/unit for Office Supplies versus Beta_Supplies at $50.03/unit\u2014a 21% premium across 174 orders. Additionally, 6 fragmented orders to Alpha_Inc within 29 days incur redundant shipping costs.",
+        "why": "Paying 21% above the best-available price wastes procurement budget. Fragmented ordering multiplies handling overhead. Combined, these inefficiencies cost approximately $2,598,774 in overpayment plus $1,250 in excess shipping.",
+        "action": "Redirect all Office Supplies volume from Alpha_Inc to Beta_Supplies and consolidate the 6 orders placed within 29 days into a single purchase to capture the $50.03/unit benchmark price and eliminate redundant shipping fees.",
         "est_impact_usd": 2598773.99,
         "source_types": [
+          "fragmented_orders",
           "maverick_price_variance"
-        ],
-        "source_indices": [
-          0
         ]
       },
       {
-        "title": "MRO Price Variance with Delta_Logistics",
-        "what": "Delta_Logistics charges $58.29/unit for MRO vs. best supplier Alpha_Inc at $49.94/unit\u2014a 16.7% premium across 164 orders.",
-        "why": "Maverick pricing: volume split across suppliers with Delta_Logistics at highest cost. Consolidation to Alpha_Inc eliminates overpayment.",
-        "action": "Shift MRO volume from Delta_Logistics to Alpha_Inc; renegotiate Delta_Logistics contract or exit.",
+        "title": "MRO: Shift Volume from Delta_Logistics (17% Premium) to Alpha_Inc",
+        "what": "Delta_Logistics averages $58.29/unit for MRO versus Alpha_Inc's $49.94/unit\u2014a 17% price spread across 164 orders. Four fragmented orders to Delta_Logistics within 28 days create additional shipping waste.",
+        "why": "The 17% unit-price premium costs approximately $2,526,625 in avoidable overpayment. Fragmented ordering adds $750 in unnecessary shipping and handling charges, and prevents volume discounts.",
+        "action": "Consolidate MRO procurement to Alpha_Inc and merge the 4 orders placed within 28 days into a single consolidated purchase to achieve the $49.94/unit benchmark and eliminate $750 in redundant shipping costs.",
         "est_impact_usd": 2526625.16,
         "source_types": [
+          "fragmented_orders",
           "maverick_price_variance"
-        ],
-        "source_indices": [
-          1
         ]
       },
       {
-        "title": "Packaging Price Variance with Epsilon_Group",
-        "what": "Epsilon_Group charges $54.53/unit for Packaging vs. best supplier Alpha_Inc at $43.60/unit\u2014a 25.1% premium across 148 orders.",
-        "why": "Maverick pricing: highest price variance (25%) among all categories. Volume concentrated with premium supplier.",
-        "action": "Consolidate Packaging volume to Alpha_Inc; eliminate or minimize Epsilon_Group orders for this category.",
+        "title": "Packaging: Eliminate 25% Price Variance by Consolidating to Alpha_Inc",
+        "what": "Epsilon_Group charges $54.53/unit for Packaging compared to Alpha_Inc's $43.60/unit\u2014a 25% premium across 148 orders. Five orders to Epsilon_Group within 25 days are fragmented and incur duplicate shipping.",
+        "why": "The 25% unit-price premium represents approximately $2,420,531 in overpayment. Fragmented ordering adds $1,000 in excess shipping costs and prevents economies of scale.",
+        "action": "Consolidate all Packaging volume to Alpha_Inc and merge the 5 orders placed within 25 days into a single purchase to lock in the $43.60/unit price and recover $1,000 in shipping savings.",
         "est_impact_usd": 2420530.79,
         "source_types": [
+          "fragmented_orders",
           "maverick_price_variance"
-        ],
-        "source_indices": [
-          2
         ]
       },
       {
-        "title": "Electronics Price Variance with Beta_Supplies",
-        "what": "Beta_Supplies charges $56.61/unit for Electronics vs. best supplier Delta_Logistics at $46.45/unit\u2014a 21.9% premium across 152 orders.",
-        "why": "Maverick pricing: volume concentrated with higher-cost supplier. Delta_Logistics offers best price.",
-        "action": "Shift Electronics volume from Beta_Supplies to Delta_Logistics; renegotiate Beta_Supplies pricing.",
+        "title": "Electronics: Eliminate Duplicate Order and Consolidate to Delta_Logistics",
+        "what": "Beta_Supplies charges $56.61/unit for Electronics versus Delta_Logistics at $46.45/unit\u2014a 22% premium across 152 orders. Two near-identical orders (~$165,110 each) were placed 3 days apart to Beta_Supplies, suggesting a duplicate. Additionally, 6 fragmented orders within 27 days incur redundant shipping.",
+        "why": "The 22% unit-price premium costs approximately $2,354,746 in overpayment. The duplicate order (~$165,110) represents wasted spend that should be recovered. Fragmented ordering adds $1,250 in excess shipping and prevents consolidation discounts.",
+        "action": "Cancel or return the duplicate order placed 3 days apart; redirect all Electronics volume to Delta_Logistics; consolidate the 6 orders placed within 27 days into a single purchase to achieve the $46.45/unit benchmark and recover $1,250 in shipping savings.",
         "est_impact_usd": 2354746.27,
         "source_types": [
+          "duplicate_order",
+          "fragmented_orders",
           "maverick_price_variance"
-        ],
-        "source_indices": [
-          3
         ]
       },
       {
-        "title": "Raw Materials Price Variance with Alpha_Inc",
-        "what": "Alpha_Inc charges $63.93/unit for Raw Materials vs. best supplier Epsilon_Group at $48.54/unit\u2014a 31.7% premium across 139 orders.",
-        "why": "Maverick pricing: largest price spread (31.7%) in dataset. Alpha_Inc is significantly overpriced.",
-        "action": "Consolidate Raw Materials volume to Epsilon_Group; eliminate Alpha_Inc as Raw Materials supplier.",
+        "title": "Raw Materials: Shift from Alpha_Inc (32% Premium) to Epsilon_Group",
+        "what": "Alpha_Inc averages $63.93/unit for Raw Materials versus Epsilon_Group's $48.54/unit\u2014a 32% price premium across 139 orders. Three orders to Alpha_Inc within 16 days are fragmented and incur duplicate shipping.",
+        "why": "The 32% unit-price premium costs approximately $2,135,427 in avoidable overpayment\u2014the largest variance in the portfolio. Fragmented ordering adds $500 in excess shipping and prevents volume leverage.",
+        "action": "Consolidate all Raw Materials procurement to Epsilon_Group and merge the 3 orders placed within 16 days into a single purchase to achieve the $48.54/unit benchmark and recover $500 in shipping savings.",
         "est_impact_usd": 2135426.55,
         "source_types": [
+          "fragmented_orders",
           "maverick_price_variance"
-        ],
-        "source_indices": [
-          5
         ]
       },
       {
-        "title": "High-Defect Orders Marked Compliant (Delta_Logistics Quality Risk)",
-        "what": "125 orders marked 'compliance=Yes' contain 10\u201316% defect rates, generating $913,236.58 in hidden quality costs. Delta_Logistics dominates with 4 of top 5 worst offenders (defect rates 13\u201316%).",
-        "why": "Compliance field tracks documentation only, not actual quality. High-defect orders pass compliance checks despite substantial material waste and rework costs.",
-        "action": "Implement quality-based compliance scoring; audit Delta_Logistics defect root causes; adjust pricing/SLAs to reflect actual quality performance; require corrective action plans.",
-        "est_impact_usd": 913236.58,
-        "source_types": [
-          "High-Defect-Rate Orders Marked Compliant"
-        ],
-        "source_indices": [
-          34
-        ]
-      },
-      {
-        "title": "Non-Compliant Spend Concentration Risk (Gamma_Co)",
-        "what": "$6,986,051.38 in non-compliant orders (137 orders, 17.6% of total spend) are accepted without penalty. Gamma_Co dominates with 5 of top 6 non-compliant orders (each >$150k).",
-        "why": "Non-compliance flag is post-hoc and non-blocking; orders are fulfilled and paid despite compliance failure. No price adjustment, return, or supplier penalty applied.",
-        "action": "Implement pre-payment compliance hold; require root-cause analysis and corrective action for non-compliant orders; consider supplier probation or delisting for Gamma_Co.",
-        "est_impact_usd": 6986051.38,
-        "source_types": [
-          "Non-Compliance Spend Concentration Risk"
-        ],
-        "source_indices": [
-          36
-        ]
-      },
-      {
-        "title": "Duplicate Order (Beta_Supplies Electronics)",
-        "what": "Two near-identical orders to Beta_Supplies for Electronics (~$165,110 each) placed 3 days apart (PO-00095 and PO-00115).",
-        "why": "Likely duplicate order or system error; both orders have similar value and placed within short window.",
-        "action": "Investigate PO-00095 and PO-00115; confirm if duplicate; if so, cancel one order and process credit from Beta_Supplies.",
-        "est_impact_usd": 165110.34,
-        "source_types": [
-          "duplicate_order"
-        ],
-        "source_indices": [
-          4
-        ]
-      },
-      {
-        "title": "Negotiation Savings Left on Table",
-        "what": "Top 10 orders show $163,394.85 in negotiated savings (10\u201315% discounts), but pattern analysis reveals inconsistent discount application across repeat supplier-item pairs.",
-        "why": "Procurement lacks systematic contract leverage; best-achieved rates not consistently applied to similar repeat purchases from same supplier.",
-        "action": "Standardize negotiated rates by supplier-item pair; apply top-achieved discount to all future orders from same supplier for same category; audit contract terms for consistency.",
-        "est_impact_usd": 163394.85,
-        "source_types": [
-          "Negotiation Savings Left on Table"
-        ],
-        "source_indices": [
-          35
-        ]
-      },
-      {
-        "title": "Tail Spend Consolidation Opportunity",
-        "what": "156 small orders (each \u2264$18,175) represent only 3.7% of spend but cost ~$15,600 to process.",
-        "why": "Fragmented small orders incur disproportionate processing overhead; consolidation reduces administrative burden.",
-        "action": "Consolidate tail orders into fewer, larger shipments; implement minimum order thresholds; use blanket orders or standing agreements for small-value items.",
+        "title": "Tail Spend: Consolidate 156 Small Orders to Reduce Processing Overhead",
+        "what": "156 small orders, each valued at or below $18,175, collectively represent only 3.7% of total spend but incur approximately $15,600 in processing costs.",
+        "why": "Small, fragmented orders consume disproportionate procurement resources (labor, systems, vendor management) relative to their spend contribution. Consolidation reduces per-unit processing overhead and improves efficiency.",
+        "action": "Implement a tail-spend consolidation program to bundle the 156 small orders into fewer, larger purchases with preferred suppliers, targeting a reduction in processing costs of approximately $15,600.",
         "est_impact_usd": 15600.0,
         "source_types": [
           "tail_spend"
-        ],
-        "source_indices": [
-          6
         ]
       },
       {
-        "title": "Fragmented Orders\u2014Multiple Suppliers (Consolidated Savings)",
-        "what": "18 instances of fragmented orders across suppliers (Delta_Logistics, Epsilon_Group, Alpha_Inc, Beta_Supplies, Gamma_Co) within 13\u201330 day windows; estimated savings from consolidation: $18,500 total.",
-        "why": "Separate orders to same supplier for same item category within short windows incur redundant shipping/handling costs; consolidation reduces logistics overhead.",
-        "action": "Implement order consolidation policy: batch orders to same supplier within 14\u201330 day windows; use standing orders or blanket agreements to reduce order frequency.",
-        "est_impact_usd": 18500.0,
+        "title": "Office Supplies via Delta_Logistics: Consolidate 7 Fragmented Orders",
+        "what": "Seven separate orders to Delta_Logistics for Office Supplies were placed within 27 days, creating redundant shipping and handling charges.",
+        "why": "Fragmented ordering to the same supplier within a short window multiplies shipping costs and prevents volume discounts. Consolidation saves approximately $1,500 in excess shipping.",
+        "action": "Consolidate the 7 Office Supplies orders to Delta_Logistics placed within 27 days into a single purchase to eliminate $1,500 in redundant shipping and handling fees.",
+        "est_impact_usd": 1500.0,
         "source_types": [
           "fragmented_orders"
-        ],
-        "source_indices": [
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30,
-          31,
-          32,
-          33
+        ]
+      },
+      {
+        "title": "Packaging via Delta_Logistics: Consolidate 6 Fragmented Orders",
+        "what": "Six separate orders to Delta_Logistics for Packaging were placed within 28 days, incurring duplicate shipping and handling costs.",
+        "why": "Fragmented ordering multiplies per-unit shipping overhead and prevents consolidation discounts. Merging these orders saves approximately $1,250 in excess shipping.",
+        "action": "Consolidate the 6 Packaging orders to Delta_Logistics placed within 28 days into a single purchase to recover $1,250 in shipping savings.",
+        "est_impact_usd": 1250.0,
+        "source_types": [
+          "fragmented_orders"
         ]
       }
     ]
