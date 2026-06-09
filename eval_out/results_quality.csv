@@ -1,5 +1,5 @@
 approach,n_findings,recall,recall_hit,recall_total,validity_mean_0_2,validity_valuable_frac,llm_calls,input_tokens,output_tokens,total_tokens,est_usd,runtime_s,note
-B1 detectors (all),36,1.0,17,17,1.694,0.694,0,0,0,0,0.0,0.125,no LLM; all 36 raw findings; validity from a random sample of 36
-SYS det+narrator,8,0.941,16,17,1.75,0.75,1,2176,1778,3954,0.011066,19.297,narrator LLM; top-8 insights; spurious 7%->2%; grounding 43/44
-B0 dump-to-LLM,0,0.0,0,17,0.0,0.0,0,0,0,0,0.0,1.109,"B0 failed: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cbt9CnoyNANDEd4DN4JY6'}"
-FULL +agentic,8,0.941,16,17,1.75,0.75,0,0,0,0,0.0,2.031,"agent: llm_error: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011Cbt9CscCYFpaMmFupXDjn'}, +0 candidates; top-8 insights"
+B1 detectors (all),36,1.0,17,17,1.694,0.694,0,0,0,0,0.0,0.078,no LLM; all 36 raw findings; validity from a random sample of 36
+SYS det+narrator,8,0.941,16,17,1.875,0.875,4,3973,2577,6550,0.016858,29.515,narrator LLM; top-8 insights; spurious 9%->0%; grounding 45/45
+B0 dump-to-LLM,6,0.059,1,17,1.667,0.667,1,35862,3513,39375,0.053427,30.312,sampled 1500 of 12152 rows to fit context budget
+FULL +agentic,8,0.824,14,17,1.625,0.625,12,13594,9890,23484,0.063044,95.078,"agent: emitted_findings, +3 candidates; top-8 insights"
