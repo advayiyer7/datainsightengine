@@ -4,114 +4,88 @@
   "meta": {
     "curated": false,
     "judged": true,
-    "candidates": 22,
-    "kept_valuable": 22,
-    "dropped_trivial_or_wrong": 0
+    "candidates": 20,
+    "kept_valuable": 17,
+    "dropped_trivial_or_wrong": 3,
+    "candidates_capped_at": null
   },
   "entries": [
     {
-      "key": "maverick_price_variance::best_supplier=Beta_Supplies|item=Office Supplies|worst_supplier=Alpha_Inc",
-      "type": "maverick_price_variance",
+      "key": "yoy_spend_movers::direction=fell|supplier=Bartlett and Company of Mexico",
+      "type": "yoy_spend_movers",
       "entities": {
-        "item": "Office Supplies",
-        "best_supplier": "Beta_Supplies",
-        "worst_supplier": "Alpha_Inc"
+        "supplier": "Bartlett and Company of Mexico",
+        "direction": "fell"
       },
       "metrics": {
-        "benchmark_unit_price": 50.03,
-        "worst_supplier_mean_price": 60.66,
-        "spread_pct": 0.212,
-        "suppliers_compared": 5,
-        "orders": 174,
-        "est_overpayment_vs_cheapest_supplier": 2598773.99
+        "spend": 173598675.37,
+        "prev_spend": 482988238.8,
+        "dollar_change": -309389563.43,
+        "pct_change": -0.6406,
+        "sign_flip": false
       },
-      "est_impact_usd": 2598773.99,
-      "one_line": "For Office Supplies, Alpha_Inc averages $60.66/unit vs Beta_Supplies's $50.03 (21% higher); shifting volume to the cheapest supplier could save up to ~$2,598,774.",
+      "est_impact_usd": 309389563.43,
+      "one_line": "Bartlett and Company of Mexico spend fell $309,389,563 (-64%) YoY ($482,988,239 \u2192 $173,598,675).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "maverick_price_variance::best_supplier=Alpha_Inc|item=Packaging|worst_supplier=Epsilon_Group",
-      "type": "maverick_price_variance",
+      "key": "yoy_spend_movers::direction=rose|supplier=C Vale - Agroindustrial Cooperative",
+      "type": "yoy_spend_movers",
       "entities": {
-        "item": "Packaging",
-        "best_supplier": "Alpha_Inc",
-        "worst_supplier": "Epsilon_Group"
+        "supplier": "C Vale - Agroindustrial Cooperative",
+        "direction": "rose"
       },
       "metrics": {
-        "benchmark_unit_price": 43.6,
-        "worst_supplier_mean_price": 54.53,
-        "spread_pct": 0.251,
-        "suppliers_compared": 5,
-        "orders": 148,
-        "est_overpayment_vs_cheapest_supplier": 2420530.79
+        "spend": 114580880.55,
+        "prev_spend": 2950426.05,
+        "dollar_change": 111630454.5,
+        "pct_change": 37.8354,
+        "sign_flip": false
       },
-      "est_impact_usd": 2420530.79,
-      "one_line": "For Packaging, Epsilon_Group averages $54.53/unit vs Alpha_Inc's $43.60 (25% higher); shifting volume to the cheapest supplier could save up to ~$2,420,531.",
+      "est_impact_usd": 111630454.5,
+      "one_line": "C Vale - Agroindustrial Cooperative spend rose $111,630,455 (+3784%) YoY ($2,950,426 \u2192 $114,580,881).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "maverick_price_variance::best_supplier=Delta_Logistics|item=Electronics|worst_supplier=Beta_Supplies",
-      "type": "maverick_price_variance",
+      "key": "yoy_spend_movers::direction=fell|supplier=ROQUETTE LTD",
+      "type": "yoy_spend_movers",
       "entities": {
-        "item": "Electronics",
-        "best_supplier": "Delta_Logistics",
-        "worst_supplier": "Beta_Supplies"
+        "supplier": "ROQUETTE LTD",
+        "direction": "fell"
       },
       "metrics": {
-        "benchmark_unit_price": 46.45,
-        "worst_supplier_mean_price": 56.61,
-        "spread_pct": 0.219,
-        "suppliers_compared": 5,
-        "orders": 152,
-        "est_overpayment_vs_cheapest_supplier": 2354746.27
+        "spend": 12522200.08,
+        "prev_spend": 113521379.15,
+        "dollar_change": -100999179.07,
+        "pct_change": -0.8897,
+        "sign_flip": false
       },
-      "est_impact_usd": 2354746.27,
-      "one_line": "For Electronics, Beta_Supplies averages $56.61/unit vs Delta_Logistics's $46.45 (22% higher); shifting volume to the cheapest supplier could save up to ~$2,354,746.",
+      "est_impact_usd": 100999179.07,
+      "one_line": "ROQUETTE LTD spend fell $100,999,179 (-89%) YoY ($113,521,379 \u2192 $12,522,200).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "duplicate_order::item=Electronics|supplier=Beta_Supplies",
-      "type": "duplicate_order",
+      "key": "yoy_spend_movers::direction=fell|supplier=THE SCOULAR COMPANY",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Beta_Supplies",
-        "item": "Electronics"
+        "supplier": "THE SCOULAR COMPANY",
+        "direction": "fell"
       },
       "metrics": {
-        "amount": 165110.34,
-        "days_apart": 3,
-        "order_total_a": 163481.65,
-        "order_total_b": 165110.34
+        "spend": 40816225.96,
+        "prev_spend": 105649297.13,
+        "dollar_change": -64833071.17,
+        "pct_change": -0.6137,
+        "sign_flip": false
       },
-      "est_impact_usd": 165110.34,
-      "one_line": "Two near-identical orders to Beta_Supplies for Electronics (~$165,110) placed 3 day(s) apart \u2014 possible duplicate.",
-      "include": true,
-      "validity": 2,
-      "source": "detector"
-    },
-    {
-      "key": "maverick_price_variance::best_supplier=Epsilon_Group|item=Raw Materials|worst_supplier=Alpha_Inc",
-      "type": "maverick_price_variance",
-      "entities": {
-        "item": "Raw Materials",
-        "best_supplier": "Epsilon_Group",
-        "worst_supplier": "Alpha_Inc"
-      },
-      "metrics": {
-        "benchmark_unit_price": 48.54,
-        "worst_supplier_mean_price": 63.93,
-        "spread_pct": 0.317,
-        "suppliers_compared": 5,
-        "orders": 139,
-        "est_overpayment_vs_cheapest_supplier": 2135426.55
-      },
-      "est_impact_usd": 2135426.55,
-      "one_line": "For Raw Materials, Alpha_Inc averages $63.93/unit vs Epsilon_Group's $48.54 (32% higher); shifting volume to the cheapest supplier could save up to ~$2,135,427.",
+      "est_impact_usd": 64833071.17,
+      "one_line": "THE SCOULAR COMPANY spend fell $64,833,071 (-61%) YoY ($105,649,297 \u2192 $40,816,226).",
       "include": true,
       "validity": 2,
       "source": "detector"
@@ -121,318 +95,248 @@
       "type": "tail_spend",
       "entities": {},
       "metrics": {
-        "tail_orders": 156,
-        "order_value_threshold": 18175.1,
-        "tail_spend": 1666308.47,
-        "tail_share_of_spend": 0.0367,
-        "est_processing_cost": 15600.0
+        "tail_suppliers": 6293,
+        "spend_threshold": 10000.0,
+        "tail_spend": 18081246.02,
+        "tail_share_of_spend": 0.0079,
+        "admin_cost_per_supplier": 500.0,
+        "est_admin_overhead": 3146500.0
       },
-      "est_impact_usd": 15600.0,
-      "one_line": "156 small orders (each <= $18,175) make up only 3.7% of spend but cost ~$15,600 to process \u2014 consolidation candidate.",
+      "est_impact_usd": 3146500.0,
+      "one_line": "6293 suppliers each below $10,000 make up only 0.8% of $2,292,858,816 spend but carry ~$3,146,500 in admin overhead (~$500/supplier) \u2014 consolidation candidate.",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Office Supplies|supplier=Delta_Logistics",
-      "type": "fragmented_orders",
+      "key": "yoy_spend_movers::direction=fell|supplier=Eiamheng Tapioca Starch Industry",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Delta_Logistics",
-        "item": "Office Supplies"
+        "supplier": "Eiamheng Tapioca Starch Industry",
+        "direction": "fell"
       },
       "metrics": {
-        "orders": 7,
-        "window_days": 27,
-        "redundant_orders": 6,
-        "est_extra_shipping": 1500.0
+        "spend": 15329.38,
+        "prev_spend": 49223232.82,
+        "dollar_change": -49207903.45,
+        "pct_change": -0.9997,
+        "sign_flip": false
       },
-      "est_impact_usd": 1500.0,
-      "one_line": "7 separate orders to Delta_Logistics for Office Supplies within 27 days; consolidating could save ~$1,500 in shipping/handling.",
+      "est_impact_usd": 49207903.45,
+      "one_line": "Eiamheng Tapioca Starch Industry spend fell $49,207,903 (-100%) YoY ($49,223,233 \u2192 $15,329).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Packaging|supplier=Delta_Logistics",
-      "type": "fragmented_orders",
+      "key": "yoy_spend_movers::direction=fell|supplier=NORFOLK SOUTHERN CORPORATION",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Delta_Logistics",
-        "item": "Packaging"
+        "supplier": "NORFOLK SOUTHERN CORPORATION",
+        "direction": "fell"
       },
       "metrics": {
-        "orders": 6,
-        "window_days": 28,
-        "redundant_orders": 5,
-        "est_extra_shipping": 1250.0
+        "spend": 22320890.99,
+        "prev_spend": 55962778.0,
+        "dollar_change": -33641887.01,
+        "pct_change": -0.6011,
+        "sign_flip": false
       },
-      "est_impact_usd": 1250.0,
-      "one_line": "6 separate orders to Delta_Logistics for Packaging within 28 days; consolidating could save ~$1,250 in shipping/handling.",
+      "est_impact_usd": 33641887.01,
+      "one_line": "NORFOLK SOUTHERN CORPORATION spend fell $33,641,887 (-60%) YoY ($55,962,778 \u2192 $22,320,891).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Electronics|supplier=Epsilon_Group",
-      "type": "fragmented_orders",
+      "key": "negative_or_anomalous_spend::signal=high_outlier|supplier=Bartlett and Company of Mexico",
+      "type": "negative_or_anomalous_spend",
       "entities": {
-        "supplier": "Epsilon_Group",
-        "item": "Electronics"
+        "signal": "high_outlier",
+        "supplier": "Bartlett and Company of Mexico"
       },
       "metrics": {
-        "orders": 6,
-        "window_days": 30,
-        "redundant_orders": 5,
-        "est_extra_shipping": 1250.0
+        "spend": 173598675.37,
+        "mean_spend": 192353.93,
+        "std_spend": 2183905.83,
+        "z_score": 79.4,
+        "outlier_k": 4.0
       },
-      "est_impact_usd": 1250.0,
-      "one_line": "6 separate orders to Epsilon_Group for Electronics within 30 days; consolidating could save ~$1,250 in shipping/handling.",
+      "est_impact_usd": 173598675.37,
+      "one_line": "Bartlett and Company of Mexico spend $173,598,675 is a statistical outlier (79.4\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Office Supplies|supplier=Alpha_Inc",
-      "type": "fragmented_orders",
+      "key": "negative_or_anomalous_spend::signal=high_outlier|supplier=C Vale - Agroindustrial Cooperative",
+      "type": "negative_or_anomalous_spend",
       "entities": {
-        "supplier": "Alpha_Inc",
-        "item": "Office Supplies"
+        "signal": "high_outlier",
+        "supplier": "C Vale - Agroindustrial Cooperative"
       },
       "metrics": {
-        "orders": 6,
-        "window_days": 29,
-        "redundant_orders": 5,
-        "est_extra_shipping": 1250.0
+        "spend": 114580880.55,
+        "mean_spend": 192353.93,
+        "std_spend": 2183905.83,
+        "z_score": 52.38,
+        "outlier_k": 4.0
       },
-      "est_impact_usd": 1250.0,
-      "one_line": "6 separate orders to Alpha_Inc for Office Supplies within 29 days; consolidating could save ~$1,250 in shipping/handling.",
+      "est_impact_usd": 114580880.55,
+      "one_line": "C Vale - Agroindustrial Cooperative spend $114,580,881 is a statistical outlier (52.4\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Office Supplies|supplier=Beta_Supplies",
-      "type": "fragmented_orders",
+      "key": "yoy_spend_movers::direction=rose|supplier=EIAM E-SAN TAPIOCA STARCH INDUSTRY",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Beta_Supplies",
-        "item": "Office Supplies"
+        "supplier": "EIAM E-SAN TAPIOCA STARCH INDUSTRY",
+        "direction": "rose"
       },
       "metrics": {
-        "orders": 6,
-        "window_days": 27,
-        "redundant_orders": 5,
-        "est_extra_shipping": 1250.0
+        "spend": 17121905.75,
+        "prev_spend": 5854121.97,
+        "dollar_change": 11267783.78,
+        "pct_change": 1.9248,
+        "sign_flip": false
       },
-      "est_impact_usd": 1250.0,
-      "one_line": "6 separate orders to Beta_Supplies for Office Supplies within 27 days; consolidating could save ~$1,250 in shipping/handling.",
+      "est_impact_usd": 11267783.78,
+      "one_line": "EIAM E-SAN TAPIOCA STARCH INDUSTRY spend rose $11,267,784 (+192%) YoY ($5,854,122 \u2192 $17,121,906).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Electronics|supplier=Beta_Supplies",
-      "type": "fragmented_orders",
+      "key": "yoy_spend_movers::direction=rose|supplier=Valley Agro Industry and Trade",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Beta_Supplies",
-        "item": "Electronics"
+        "supplier": "Valley Agro Industry and Trade",
+        "direction": "rose"
       },
       "metrics": {
-        "orders": 6,
-        "window_days": 27,
-        "redundant_orders": 5,
-        "est_extra_shipping": 1250.0
+        "spend": 10658968.51,
+        "prev_spend": 2079337.05,
+        "dollar_change": 8579631.46,
+        "pct_change": 4.1261,
+        "sign_flip": false
       },
-      "est_impact_usd": 1250.0,
-      "one_line": "6 separate orders to Beta_Supplies for Electronics within 27 days; consolidating could save ~$1,250 in shipping/handling.",
+      "est_impact_usd": 8579631.46,
+      "one_line": "Valley Agro Industry and Trade spend rose $8,579,631 (+413%) YoY ($2,079,337 \u2192 $10,658,969).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Packaging|supplier=Gamma_Co",
-      "type": "fragmented_orders",
+      "key": "negative_or_anomalous_spend::largest=COPAM Portuguese Company of Starch|signal=negative_spend",
+      "type": "negative_or_anomalous_spend",
       "entities": {
-        "supplier": "Gamma_Co",
-        "item": "Packaging"
+        "signal": "negative_spend",
+        "largest": "COPAM Portuguese Company of Starch"
       },
       "metrics": {
-        "orders": 5,
-        "window_days": 27,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
+        "negative_suppliers": 34,
+        "total_negative_spend": -315725.6,
+        "most_negative_value": -197376.71
       },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Gamma_Co for Packaging within 27 days; consolidating could save ~$1,000 in shipping/handling.",
+      "est_impact_usd": 315725.6,
+      "one_line": "34 suppliers have negative total spend (refunds/credits/adjustments or errors) totaling $-315,726; most negative is COPAM Portuguese Company of Starch at $-197,377 \u2014 verify.",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=MRO|supplier=Epsilon_Group",
-      "type": "fragmented_orders",
+      "key": "yoy_spend_movers::direction=rose|supplier=THE ANDERSONS INC",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Epsilon_Group",
-        "item": "MRO"
+        "supplier": "THE ANDERSONS INC",
+        "direction": "rose"
       },
       "metrics": {
-        "orders": 5,
-        "window_days": 18,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
+        "spend": 4724548.81,
+        "prev_spend": 564704.16,
+        "dollar_change": 4159844.65,
+        "pct_change": 7.3664,
+        "sign_flip": false
       },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Epsilon_Group for MRO within 18 days; consolidating could save ~$1,000 in shipping/handling.",
+      "est_impact_usd": 4159844.65,
+      "one_line": "THE ANDERSONS INC spend rose $4,159,845 (+737%) YoY ($564,704 \u2192 $4,724,549).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Electronics|supplier=Gamma_Co",
-      "type": "fragmented_orders",
+      "key": "yoy_spend_movers::direction=rose|supplier=SAP AMERICA INC.",
+      "type": "yoy_spend_movers",
       "entities": {
-        "supplier": "Gamma_Co",
-        "item": "Electronics"
+        "supplier": "SAP AMERICA INC.",
+        "direction": "rose"
       },
       "metrics": {
-        "orders": 5,
-        "window_days": 14,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
+        "spend": 4103150.92,
+        "prev_spend": 375000.0,
+        "dollar_change": 3728150.92,
+        "pct_change": 9.9417,
+        "sign_flip": false
       },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Gamma_Co for Electronics within 14 days; consolidating could save ~$1,000 in shipping/handling.",
+      "est_impact_usd": 3728150.92,
+      "one_line": "SAP AMERICA INC. spend rose $3,728,151 (+994%) YoY ($375,000 \u2192 $4,103,151).",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Packaging|supplier=Epsilon_Group",
-      "type": "fragmented_orders",
+      "key": "new_and_churned_suppliers::signal=churned|supplier=SIEMENS INDUSTRIAL TURBOMACHINERY L",
+      "type": "new_and_churned_suppliers",
       "entities": {
-        "supplier": "Epsilon_Group",
-        "item": "Packaging"
+        "supplier": "SIEMENS INDUSTRIAL TURBOMACHINERY L",
+        "signal": "churned"
       },
       "metrics": {
-        "orders": 5,
-        "window_days": 25,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
+        "spend": 0.4,
+        "prev_spend": 1193635.03
       },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Epsilon_Group for Packaging within 25 days; consolidating could save ~$1,000 in shipping/handling.",
+      "est_impact_usd": 1193635.03,
+      "one_line": "SIEMENS INDUSTRIAL TURBOMACHINERY L appears CHURNED: $1,193,635 prior \u2192 ~$0 current spend.",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Office Supplies|supplier=Epsilon_Group",
-      "type": "fragmented_orders",
+      "key": "new_and_churned_suppliers::signal=churned|supplier=KENCO LOGISTICS SERVICES LLC",
+      "type": "new_and_churned_suppliers",
       "entities": {
-        "supplier": "Epsilon_Group",
-        "item": "Office Supplies"
+        "supplier": "KENCO LOGISTICS SERVICES LLC",
+        "signal": "churned"
       },
       "metrics": {
-        "orders": 5,
-        "window_days": 30,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
+        "spend": 0.0,
+        "prev_spend": 451236.43
       },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Epsilon_Group for Office Supplies within 30 days; consolidating could save ~$1,000 in shipping/handling.",
+      "est_impact_usd": 451236.43,
+      "one_line": "KENCO LOGISTICS SERVICES LLC appears CHURNED: $451,236 prior \u2192 ~$0 current spend.",
       "include": true,
       "validity": 2,
       "source": "detector"
     },
     {
-      "key": "fragmented_orders::item=Packaging|supplier=Beta_Supplies",
-      "type": "fragmented_orders",
+      "key": "supplier_concentration::top_supplier=Bartlett and Company of Mexico",
+      "type": "supplier_concentration",
       "entities": {
-        "supplier": "Beta_Supplies",
-        "item": "Packaging"
+        "top_supplier": "Bartlett and Company of Mexico"
       },
       "metrics": {
-        "orders": 5,
-        "window_days": 26,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
+        "top_n": 10,
+        "top_n_share": 0.2267,
+        "top_n_spend": 519879381.37,
+        "total_positive_spend": 2292859147.34,
+        "hhi": 0.0109,
+        "n_suppliers": 11920,
+        "largest_supplier_spend": 173598675.37
       },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Beta_Supplies for Packaging within 26 days; consolidating could save ~$1,000 in shipping/handling.",
-      "include": true,
-      "validity": 2,
-      "source": "detector"
-    },
-    {
-      "key": "fragmented_orders::item=Raw Materials|supplier=Gamma_Co",
-      "type": "fragmented_orders",
-      "entities": {
-        "supplier": "Gamma_Co",
-        "item": "Raw Materials"
-      },
-      "metrics": {
-        "orders": 5,
-        "window_days": 25,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
-      },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Gamma_Co for Raw Materials within 25 days; consolidating could save ~$1,000 in shipping/handling.",
-      "include": true,
-      "validity": 2,
-      "source": "detector"
-    },
-    {
-      "key": "fragmented_orders::item=MRO|supplier=Alpha_Inc",
-      "type": "fragmented_orders",
-      "entities": {
-        "supplier": "Alpha_Inc",
-        "item": "MRO"
-      },
-      "metrics": {
-        "orders": 5,
-        "window_days": 19,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
-      },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Alpha_Inc for MRO within 19 days; consolidating could save ~$1,000 in shipping/handling.",
-      "include": true,
-      "validity": 2,
-      "source": "detector"
-    },
-    {
-      "key": "fragmented_orders::item=Office Supplies|supplier=Gamma_Co",
-      "type": "fragmented_orders",
-      "entities": {
-        "supplier": "Gamma_Co",
-        "item": "Office Supplies"
-      },
-      "metrics": {
-        "orders": 5,
-        "window_days": 28,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
-      },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Gamma_Co for Office Supplies within 28 days; consolidating could save ~$1,000 in shipping/handling.",
-      "include": true,
-      "validity": 2,
-      "source": "detector"
-    },
-    {
-      "key": "fragmented_orders::item=Raw Materials|supplier=Delta_Logistics",
-      "type": "fragmented_orders",
-      "entities": {
-        "supplier": "Delta_Logistics",
-        "item": "Raw Materials"
-      },
-      "metrics": {
-        "orders": 5,
-        "window_days": 21,
-        "redundant_orders": 4,
-        "est_extra_shipping": 1000.0
-      },
-      "est_impact_usd": 1000.0,
-      "one_line": "5 separate orders to Delta_Logistics for Raw Materials within 21 days; consolidating could save ~$1,000 in shipping/handling.",
+      "est_impact_usd": 519879381.37,
+      "one_line": "Top 10 suppliers account for 23% of $2,292,859,147 total positive spend (HHI 0.011, 11920 suppliers); largest is Bartlett and Company of Mexico at $173,598,675.",
       "include": true,
       "validity": 2,
       "source": "detector"

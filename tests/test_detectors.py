@@ -1,7 +1,8 @@
-"""Unit tests for Tier-1 detectors using small hand-built frames with known answers.
+"""Unit tests for the SPEND-GRAIN detectors (one row per supplier-year).
 
-Covers 5 of the 7 detectors (spec requires >= 3). Each test constructs a tiny
-DataFrame where the correct finding is obvious, then asserts the detector's numbers.
+Covers 5 detectors with small hand-built frames, INCLUDING the two data-quality
+edge cases the real dataset has: negative totalSpend, and tiny prevYearSpend that
+makes the naive YoY ratio explode (must be excluded by the robust YoY logic).
 """
 
 from __future__ import annotations
@@ -10,153 +11,137 @@ import pandas as pd
 import pytest
 
 from insight.detectors.library import (
-    detect_duplicate_order,
-    detect_fragmented_orders,
-    detect_maverick_price_variance,
-    detect_single_source_risk,
+    detect_negative_or_anomalous_spend,
+    detect_new_and_churned_suppliers,
     detect_supplier_concentration,
+    detect_tail_spend,
+    detect_yoy_spend_movers,
 )
 
 
 def make_df(rows: list[dict]) -> pd.DataFrame:
-    """Build a cleaned canonical frame from row dicts, filling derived columns."""
     df = pd.DataFrame(rows)
-    if "order_date" in df:
-        df["order_date"] = pd.to_datetime(df["order_date"])
-    if "effective_unit_price" not in df and "unit_price" in df:
-        df["effective_unit_price"] = df["unit_price"]
-    if "total" not in df and {"quantity", "effective_unit_price"} <= set(df.columns):
-        df["total"] = df["quantity"] * df["effective_unit_price"]
-    if "category" not in df and "item" in df:
-        df["category"] = df["item"]
     if "row_id" not in df:
         df["row_id"] = ["r%d" % i for i in range(len(df))]
     return df
 
 
-def test_fragmented_orders_detects_dense_window():
-    # 4 orders to same supplier+item within 10 days -> consolidation candidate.
-    df = make_df(
-        [
-            {"supplier": "A", "item": "widget", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-01-01"},
-            {"supplier": "A", "item": "widget", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-01-04"},
-            {"supplier": "A", "item": "widget", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-01-07"},
-            {"supplier": "A", "item": "widget", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-01-10"},
-            # a far-away order should not be folded into the window
-            {"supplier": "A", "item": "widget", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-06-01"},
-        ]
-    )
-    out = detect_fragmented_orders(df, {"min_orders": 3, "window_days": 30, "shipping_cost_per_order": 250})
+# --- supplier_concentration -------------------------------------------------
+def test_supplier_concentration_share_and_hhi():
+    # One supplier with 80% of positive spend.
+    df = make_df([
+        {"supplier": "Big", "spend": 800.0, "prev_spend": 700.0},
+        {"supplier": "B", "spend": 100.0, "prev_spend": 100.0},
+        {"supplier": "C", "spend": 100.0, "prev_spend": 100.0},
+    ])
+    out = detect_supplier_concentration(df, {"top_n": 1})
     assert len(out) == 1
     f = out[0]
-    assert f.metrics["orders"] == 4
-    assert f.metrics["redundant_orders"] == 3
-    assert f.est_impact_usd == pytest.approx(750.0)  # 3 * 250
+    assert f.metrics["top_n_share"] == pytest.approx(0.8)
+    assert f.metrics["total_positive_spend"] == pytest.approx(1000.0)
+    # HHI = 0.8^2 + 0.1^2 + 0.1^2 = 0.66
+    assert f.metrics["hhi"] == pytest.approx(0.66)
+    assert f.entities["top_supplier"] == "Big"
 
 
-def test_fragmented_orders_below_threshold_silent():
-    df = make_df(
-        [
-            {"supplier": "A", "item": "w", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-01-01"},
-            {"supplier": "A", "item": "w", "quantity": 1, "effective_unit_price": 10, "order_date": "2023-01-02"},
-        ]
-    )
-    assert detect_fragmented_orders(df, {"min_orders": 3, "window_days": 30}) == []
+def test_concentration_ignores_negative_spend_in_total():
+    # Negative spend must not be counted in the positive-spend denominator.
+    df = make_df([
+        {"supplier": "A", "spend": 900.0, "prev_spend": 0.0},
+        {"supplier": "B", "spend": 100.0, "prev_spend": 0.0},
+        {"supplier": "Refund", "spend": -500.0, "prev_spend": 0.0},
+    ])
+    out = detect_supplier_concentration(df, {"top_n": 1})
+    assert out[0].metrics["total_positive_spend"] == pytest.approx(1000.0)
 
 
-def test_maverick_price_variance_benchmarks_cheapest_supplier():
-    # Supplier B averages 10/unit, supplier A averages 20/unit for the same item.
-    rows = []
-    for _ in range(3):
-        rows.append({"supplier": "A", "item": "x", "quantity": 100, "effective_unit_price": 20, "order_date": "2023-01-01"})
-        rows.append({"supplier": "B", "item": "x", "quantity": 100, "effective_unit_price": 10, "order_date": "2023-01-01"})
+# --- tail_spend -------------------------------------------------------------
+def test_tail_spend_counts_and_admin_cost():
+    rows = [{"supplier": f"small{i}", "spend": 100.0, "prev_spend": 0.0} for i in range(4)]
+    rows.append({"supplier": "Big", "spend": 1_000_000.0, "prev_spend": 0.0})
     df = make_df(rows)
-    out = detect_maverick_price_variance(df, {"min_orders": 3, "variance_pct": 0.15})
+    out = detect_tail_spend(df, {"tail_threshold_usd": 10000.0, "admin_cost_per_supplier": 500.0})
     assert len(out) == 1
     f = out[0]
-    assert f.metrics["benchmark_unit_price"] == pytest.approx(10.0)
-    assert f.entities["best_supplier"] == "B"
-    assert f.entities["worst_supplier"] == "A"
-    # Overpayment: A's 3*100 units at 20 vs benchmark 10 = 3*100*10 = 3000; B at benchmark = 0.
-    assert f.est_impact_usd == pytest.approx(3000.0)
+    assert f.metrics["tail_suppliers"] == 4
+    assert f.est_impact_usd == pytest.approx(2000.0)  # 4 * 500
 
 
-def test_maverick_ignores_tiny_supplier_sample():
-    # B has only 1 order -> cannot be the benchmark; with only A qualifying, no finding.
-    rows = [{"supplier": "A", "item": "x", "quantity": 10, "effective_unit_price": 20, "order_date": "2023-01-01"} for _ in range(3)]
-    rows.append({"supplier": "B", "item": "x", "quantity": 10, "effective_unit_price": 5, "order_date": "2023-01-01"})
+# --- yoy_spend_movers (robust) ---------------------------------------------
+def test_yoy_real_mover_surfaced_with_correct_numbers():
+    df = make_df([
+        {"supplier": "Riser", "spend": 60000.0, "prev_spend": 20000.0},
+    ])
+    out = detect_yoy_spend_movers(df, {"base_floor": 1000.0, "min_abs_change": 10000.0, "top_k": 5})
+    assert len(out) == 1
+    f = out[0]
+    assert f.metrics["dollar_change"] == pytest.approx(40000.0)
+    assert f.metrics["pct_change"] == pytest.approx(2.0)  # 40000 / 20000
+    assert f.entities["direction"] == "rose"
+
+
+def test_yoy_tiny_prevspend_noise_is_excluded():
+    # prevYearSpend in cents -> naive ratio explodes, but robust logic must DROP it:
+    # prev_spend < base_floor AND abs change < min_abs_change.
+    df = make_df([
+        {"supplier": "NoiseCo", "spend": 3459.02, "prev_spend": 0.0287},
+    ])
+    out = detect_yoy_spend_movers(df, {"base_floor": 1000.0, "min_abs_change": 10000.0, "top_k": 5})
+    assert out == []
+
+
+def test_yoy_sign_flip_flagged():
+    df = make_df([
+        {"supplier": "Flipper", "spend": -5000.0, "prev_spend": 50000.0},
+    ])
+    out = detect_yoy_spend_movers(df, {"base_floor": 1000.0, "min_abs_change": 10000.0, "top_k": 5})
+    assert len(out) == 1
+    assert out[0].metrics["sign_flip"] is True
+    assert out[0].entities["direction"] == "fell"
+
+
+# --- negative_or_anomalous_spend (edge case: negatives) ---------------------
+def test_negative_spend_surfaced():
+    df = make_df([
+        {"supplier": "Normal", "spend": 1000.0, "prev_spend": 1000.0},
+        {"supplier": "CreditA", "spend": -5000.0, "prev_spend": 0.0},
+        {"supplier": "CreditB", "spend": -20000.0, "prev_spend": 0.0},
+    ])
+    out = detect_negative_or_anomalous_spend(df, {"outlier_k": 3.0})
+    neg = [f for f in out if f.entities.get("signal") == "negative_spend"]
+    assert len(neg) == 1
+    assert neg[0].metrics["negative_suppliers"] == 2
+    assert neg[0].metrics["total_negative_spend"] == pytest.approx(-25000.0)
+    assert neg[0].metrics["most_negative_value"] == pytest.approx(-20000.0)
+
+
+def test_high_outlier_surfaced():
+    rows = [{"supplier": f"s{i}", "spend": 1000.0, "prev_spend": 0.0} for i in range(20)]
+    rows.append({"supplier": "Giant", "spend": 1_000_000.0, "prev_spend": 0.0})
     df = make_df(rows)
-    assert detect_maverick_price_variance(df, {"min_orders": 3, "variance_pct": 0.15}) == []
+    out = detect_negative_or_anomalous_spend(df, {"outlier_k": 3.0})
+    outliers = [f for f in out if f.entities.get("signal") == "high_outlier"]
+    assert any(f.entities.get("supplier") == "Giant" for f in outliers)
 
 
-def test_supplier_concentration_flags_dominant_supplier():
-    # One supplier owns 90% of a category's spend.
-    df = make_df(
-        [
-            {"supplier": "Dom", "item": "cat1", "quantity": 90, "effective_unit_price": 100, "order_date": "2023-01-01"},
-            {"supplier": "Small", "item": "cat1", "quantity": 10, "effective_unit_price": 100, "order_date": "2023-01-02"},
-        ]
-    )
-    out = detect_supplier_concentration(df, {"share_threshold": 0.5, "hhi_threshold": 0.3})
-    assert len(out) == 1
-    f = out[0]
-    assert f.entities["supplier"] == "Dom"
-    assert f.metrics["top_supplier_share"] == pytest.approx(0.9)
-    # HHI = 0.9^2 + 0.1^2 = 0.82
-    assert f.metrics["hhi"] == pytest.approx(0.82)
+# --- new_and_churned_suppliers ----------------------------------------------
+def test_new_and_churned_detection():
+    df = make_df([
+        {"supplier": "NewCo", "spend": 50000.0, "prev_spend": 0.0},      # new
+        {"supplier": "GoneCo", "spend": 0.0, "prev_spend": 80000.0},     # churned
+        {"supplier": "Steady", "spend": 30000.0, "prev_spend": 30000.0}, # neither
+    ])
+    out = detect_new_and_churned_suppliers(df, {"near_zero": 1.0, "material": 10000.0})
+    signals = {(f.entities["supplier"], f.entities["signal"]) for f in out}
+    assert ("NewCo", "new") in signals
+    assert ("GoneCo", "churned") in signals
+    assert len(out) == 2
 
 
-def test_supplier_concentration_diverse_market_silent():
-    df = make_df(
-        [
-            {"supplier": s, "item": "cat1", "quantity": 25, "effective_unit_price": 100, "order_date": "2023-01-01"}
-            for s in ["A", "B", "C", "D"]
-        ]
-    )
-    assert detect_supplier_concentration(df, {"share_threshold": 0.5, "hhi_threshold": 0.3}) == []
-
-
-def test_single_source_risk_flags_sole_supplier():
-    df = make_df(
-        [
-            {"supplier": "Only", "item": "rare", "quantity": 1000, "effective_unit_price": 50, "order_date": "2023-01-01"},
-            {"supplier": "Only", "item": "rare", "quantity": 1000, "effective_unit_price": 50, "order_date": "2023-02-01"},
-        ]
-    )
-    out = detect_single_source_risk(df, {"min_spend": 10000})
-    assert len(out) == 1
-    assert out[0].entities["supplier"] == "Only"
-    assert out[0].metrics["spend_at_risk"] == pytest.approx(100000.0)
-
-
-def test_single_source_risk_multi_supplier_silent():
-    df = make_df(
-        [
-            {"supplier": "A", "item": "common", "quantity": 1000, "effective_unit_price": 50, "order_date": "2023-01-01"},
-            {"supplier": "B", "item": "common", "quantity": 1000, "effective_unit_price": 50, "order_date": "2023-02-01"},
-        ]
-    )
-    assert detect_single_source_risk(df, {"min_spend": 10000}) == []
-
-
-def test_duplicate_order_flags_near_identical():
-    df = make_df(
-        [
-            {"supplier": "A", "item": "x", "quantity": 100, "effective_unit_price": 10, "order_date": "2023-01-01"},
-            {"supplier": "A", "item": "x", "quantity": 100, "effective_unit_price": 10, "order_date": "2023-01-03"},
-        ]
-    )
-    out = detect_duplicate_order(df, {"window_days": 5, "amount_tol_pct": 0.01})
-    assert len(out) == 1
-    assert out[0].metrics["days_apart"] == 2
-    assert out[0].metrics["amount"] == pytest.approx(1000.0)
-
-
-def test_duplicate_order_outside_window_silent():
-    df = make_df(
-        [
-            {"supplier": "A", "item": "x", "quantity": 100, "effective_unit_price": 10, "order_date": "2023-01-01"},
-            {"supplier": "A", "item": "x", "quantity": 100, "effective_unit_price": 10, "order_date": "2023-02-01"},
-        ]
-    )
-    assert detect_duplicate_order(df, {"window_days": 5, "amount_tol_pct": 0.01}) == []
+def test_detectors_skip_when_columns_absent():
+    # Wrong-grain frame (no spend column) -> detectors emit a 'skipped' marker, not a crash.
+    df = make_df([{"supplier": "A", "item": "x", "quantity": 1}])
+    out = detect_supplier_concentration(df, {})
+    assert out and out[0].type.endswith("_skipped")
+    out2 = detect_yoy_spend_movers(df, {})
+    assert out2 and out2[0].type.endswith("_skipped")

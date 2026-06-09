@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .findings import Finding
+from .jsonx import loads_lenient
 from .llm import LLMClient
 
 SYSTEM = (
@@ -44,14 +45,7 @@ class JudgeResult:
 
 
 def _extract_json(text: str) -> dict[str, Any]:
-    text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.MULTILINE).strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        s, e = text.find("{"), text.rfind("}")
-        if s != -1 and e > s:
-            return json.loads(text[s : e + 1])
-        raise
+    return loads_lenient(text, array_key="scores")
 
 
 def judge_findings(

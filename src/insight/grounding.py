@@ -92,9 +92,12 @@ def allowed_value_pool(findings: Iterable[Finding]) -> set[float]:
         pool.add(v)
         pool.add(round(v))
         pool.add(round(v, 2))
-        if 0.0 <= v <= 1.0:
-            pool.add(round(v * 100, 2))
-            pool.add(round(v * 100))
+        # A ratio justifies its percentage form. Handle negative ratios too: a
+        # -0.64 YoY change is narrated as "64%" (sign carried in words).
+        if abs(v) <= 1.0:
+            for pct in (v * 100, abs(v) * 100):
+                pool.add(round(pct, 2))
+                pool.add(round(pct))
     return pool
 
 

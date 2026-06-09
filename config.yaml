@@ -3,25 +3,18 @@
 # Edit thresholds to tune detector sensitivity for your dataset.
 
 # ---------------------------------------------------------------------------
-# Tier 0 — schema mapping override.
-# The ingest step fuzzy-matches your CSV headers to the canonical fields the
-# detectors need. If a guess is wrong, force it here: canonical_field: CSV_Header
-# Canonical fields: supplier, item, quantity, unit_price, total, order_date,
-#   category, shipping_cost, lead_time, delivery_date, risk_score, country,
-#   order_status, negotiated_price, defective_units, compliance
+# Tier 0 — schema mapping override (spend-grain dataset: one row per supplier-year).
+# The ingest step fuzzy-matches headers to canonical fields; override here if wrong.
+# Spend-grain canonical fields: supplier, spend, prev_spend, yoy_change, year.
+# (A `spend` mapping switches the engine to spend grain automatically.)
 # ---------------------------------------------------------------------------
 column_map:
-  supplier: Supplier
-  item: Item_Category          # this dataset has no SKU; category is the finest grain
-  category: Item_Category
-  quantity: Quantity
-  unit_price: Unit_Price
-  negotiated_price: Negotiated_Price
-  order_date: Order_Date
-  delivery_date: Delivery_Date
-  order_status: Order_Status
-  defective_units: Defective_Units
-  compliance: Compliance
+  supplier: supplierName
+  spend: totalSpend
+  prev_spend: prevYearSpend
+  yoy_change: yoyChange          # provided ratio — carried but NOT trusted (noisy)
+  year: year
+  spend_flag: flagGreaterThan50PercentChange   # provided flag — NOT trusted (~69% TRUE)
 
 # ---------------------------------------------------------------------------
 # LLM settings. Key is read from the ANTHROPIC_API_KEY env var — never hardcode.
@@ -49,29 +42,24 @@ narrator:
 # ---------------------------------------------------------------------------
 # Tier 1 — detector thresholds.
 # ---------------------------------------------------------------------------
+# Spend-grain detectors (one row per supplier-year).
 detectors:
-  fragmented_orders:
-    min_orders: 3            # >= this many orders...
-    window_days: 30          # ...within this rolling window (same supplier+item)
-    shipping_cost_per_order: 250.0   # assumed avoidable handling/shipping per redundant order
   supplier_concentration:
-    share_threshold: 0.5     # flag category where top supplier exceeds this spend share
-    hhi_threshold: 0.30      # OR Herfindahl index above this
-  maverick_price_variance:
-    min_orders: 3            # need at least this many buys of the item to compare
-    variance_pct: 0.15       # flag if (max-min)/min unit price exceeds this
+    top_n: 10                  # top-N suppliers whose cumulative spend share we report
   tail_spend:
-    spend_quantile: 0.20     # suppliers in the bottom X of spend are "tail"
-    max_share: 0.05          # ...and collectively below this share of total spend
-    processing_cost_per_order: 100.0  # assumed cost to process one PO
-  single_source_risk:
-    min_spend: 10000.0       # only flag single-sourced items above this spend
-  timing_anomaly:
-    lead_time_z: 2.0         # lead-time outlier if z-score beyond this vs supplier norm
-    end_of_period_share: 0.40  # flag if > this share of a supplier's orders land in last month of quarter
-  duplicate_order:
-    window_days: 5           # same supplier+item+amount within this window = suspected duplicate
-    amount_tol_pct: 0.01     # total amounts within 1% count as identical
+    tail_threshold_usd: 10000.0   # suppliers below this spend are "tail"
+    admin_cost_per_supplier: 500.0 # assumed admin overhead carried per supplier
+  yoy_spend_movers:
+    base_floor: 1000.0         # floor prior spend so tiny denominators don't explode YoY %
+    min_abs_change: 10000.0    # only surface movers with at least this dollar change
+    top_k: 10                  # top-k risers and top-k fallers
+  negative_or_anomalous_spend:
+    outlier_k: 3.0             # spend > mean + k*std is a high outlier
+    top_negatives: 8
+    top_outliers: 8
+  new_and_churned_suppliers:
+    near_zero: 1.0             # |spend| below this counts as "absent"
+    material: 10000.0          # current/prior spend above this counts as "material"
 
 # ---------------------------------------------------------------------------
 # Tier 3 — agentic discovery bounds (enforced, non-negotiable).
@@ -80,7 +68,7 @@ agentic:
   max_iterations: 8
   max_wall_clock_seconds: 120
   max_tokens: 60000
-  goal: "Find avoidable procurement cost or anomalies worth more than $5000 that the fixed detectors might miss."
+  goal: "Find spend patterns or anomalies in this supplier-year data (concentration, tail spend, robust YoY movement, negative/outlier spend, new/churned suppliers) worth more than $50000 that the fixed detectors might miss."
 
 # ---------------------------------------------------------------------------
 # Evaluation harness.

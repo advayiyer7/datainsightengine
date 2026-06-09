@@ -31,7 +31,9 @@ def _merge_key(f: Finding) -> str:
     if supplier and item:
         return f"sup={supplier}|item={item}"
     if supplier:
-        return f"sup={supplier}|sig={ents.get('signal', '')}"
+        # Merge ALL signals about one supplier into a single insight (e.g. a big YoY
+        # drop AND being a spend outlier for the same supplier become one finding).
+        return f"sup={supplier}"
     if item:
         return f"item={item}"
     # No entities (e.g. tail_spend) — keep each such finding distinct by type+oneline.

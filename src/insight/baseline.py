@@ -16,16 +16,20 @@ from typing import Any
 import pandas as pd
 
 from .findings import Finding
+from .jsonx import loads_lenient
 from .llm import LLMClient
 
 SYSTEM = (
-    "You are a procurement analyst. You are given RAW purchase-order rows as CSV. Find the most "
-    "valuable, actionable insights (avoidable cost, risk, anomalies). For each, return a finding "
-    "object. Return ONLY JSON: {\"findings\":[{\"type\":str,\"severity\":0-1,\"entities\":{...},"
-    "\"metrics\":{...numbers...},\"evidence\":{...},\"est_impact_usd\":number|null,\"one_line\":str}]}.\n"
+    "You are a procurement spend analyst. You are given RAW supplier-spend rows as CSV (one row per "
+    "supplier-year: supplier, spend, prev_spend, ...). Find the most valuable, actionable insights "
+    "(spend concentration, tail spend, big YoY moves, negative/anomalous spend, new/churned suppliers). "
+    "Any provided yoyChange/flag columns are noisy (tiny prior-spend denominators) — recompute YoY "
+    "yourself. For each insight return a finding object. Return ONLY JSON: "
+    "{\"findings\":[{\"type\":str,\"severity\":0-1,\"entities\":{...},\"metrics\":{...numbers...},"
+    "\"evidence\":{...},\"est_impact_usd\":number|null,\"one_line\":str}]}.\n"
     "Use finding 'type' values from this vocabulary when applicable so results are comparable: "
-    "fragmented_orders, supplier_concentration, maverick_price_variance, tail_spend, "
-    "single_source_risk, timing_anomaly, duplicate_order. Base every number on the rows you were given."
+    "supplier_concentration, tail_spend, yoy_spend_movers, negative_or_anomalous_spend, "
+    "new_and_churned_suppliers. Base every number on the rows you were given."
 )
 
 
@@ -48,18 +52,13 @@ class BaselineResult:
 
 
 def _extract_json(text: str) -> dict[str, Any]:
-    text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.MULTILINE).strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        s, e = text.find("{"), text.rfind("}")
-        if s != -1 and e > s:
-            return json.loads(text[s : e + 1])
-        raise
+    return loads_lenient(text, array_key="findings")
 
 
 def _columns_for_baseline(df: pd.DataFrame) -> list[str]:
-    prefer = ["row_id", "supplier", "item", "category", "quantity", "effective_unit_price",
+    # Spend-grain columns first, then transaction-grain fallbacks.
+    prefer = ["supplier", "spend", "prev_spend", "year",
+              "item", "category", "quantity", "effective_unit_price",
               "total", "order_date", "lead_time_days", "order_status"]
     return [c for c in prefer if c in df.columns]
 

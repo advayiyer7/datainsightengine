@@ -34,35 +34,28 @@ DEFAULTS: dict[str, Any] = {
         # diverse when one type dominates the high-impact tail. null = no cap.
         "max_per_type": 3,
     },
+    # Spend-grain detectors (one row per supplier-year). Thresholds tunable here.
     "detectors": {
-        "fragmented_orders": {
-            "min_orders": 3,
-            "window_days": 30,
-            "shipping_cost_per_order": 250.0,
-        },
         "supplier_concentration": {
-            "share_threshold": 0.5,
-            "hhi_threshold": 0.30,
-        },
-        "maverick_price_variance": {
-            "min_orders": 3,
-            "variance_pct": 0.15,
+            "top_n": 10,
         },
         "tail_spend": {
-            "spend_quantile": 0.20,
-            "max_share": 0.05,
-            "processing_cost_per_order": 100.0,
+            "tail_threshold_usd": 10000.0,
+            "admin_cost_per_supplier": 500.0,
         },
-        "single_source_risk": {
-            "min_spend": 10000.0,
+        "yoy_spend_movers": {
+            "base_floor": 1000.0,       # ignore movers whose prior spend is below this
+            "min_abs_change": 10000.0,  # ...or whose dollar change is below this
+            "top_k": 10,                # surface top-k risers and top-k fallers
         },
-        "timing_anomaly": {
-            "lead_time_z": 2.0,
-            "end_of_period_share": 0.40,
+        "negative_or_anomalous_spend": {
+            "outlier_k": 3.0,           # spend > mean + k*std is a high outlier
+            "top_negatives": 8,
+            "top_outliers": 8,
         },
-        "duplicate_order": {
-            "window_days": 5,
-            "amount_tol_pct": 0.01,
+        "new_and_churned_suppliers": {
+            "near_zero": 1.0,           # |spend| below this counts as "absent"
+            "material": 10000.0,        # current/prior spend above this counts as "material"
         },
     },
     "agentic": {
@@ -70,8 +63,9 @@ DEFAULTS: dict[str, Any] = {
         "max_wall_clock_seconds": 120,
         "max_tokens": 60000,
         "goal": (
-            "Find avoidable procurement cost or anomalies worth more than $5000 "
-            "that the fixed detectors might miss."
+            "Find spend patterns or anomalies in this supplier-year data (concentration, "
+            "tail spend, robust YoY movement, negative/outlier spend, new/churned suppliers) "
+            "worth more than $50000 that the fixed detectors might miss."
         ),
     },
     "evaluate": {

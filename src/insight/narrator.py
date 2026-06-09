@@ -24,6 +24,7 @@ from typing import Any
 
 from .findings import Finding
 from .grounding import GroundingResult, check_grounding
+from .jsonx import loads_lenient
 from .llm import LLMClient
 from .selection import InsightGroup, select_findings, selected_findings
 
@@ -104,58 +105,10 @@ class NarrationResult:
 
 
 # ---------------------------------------------------------------------------
-# JSON extraction (tolerant of fences / truncation)
+# JSON extraction (tolerant of fences / prose / commas-in-numbers / truncation)
 # ---------------------------------------------------------------------------
-def _salvage_insights(text: str) -> list[dict[str, Any]]:
-    idx = text.find("[")
-    if idx == -1:
-        return []
-    objs: list[dict[str, Any]] = []
-    depth, start, in_str, esc = 0, None, False, False
-    for i in range(idx, len(text)):
-        ch = text[i]
-        if in_str:
-            if esc:
-                esc = False
-            elif ch == "\\":
-                esc = True
-            elif ch == '"':
-                in_str = False
-            continue
-        if ch == '"':
-            in_str = True
-        elif ch == "{":
-            if depth == 0:
-                start = i
-            depth += 1
-        elif ch == "}":
-            depth -= 1
-            if depth == 0 and start is not None:
-                try:
-                    objs.append(json.loads(text[start : i + 1]))
-                except json.JSONDecodeError:
-                    pass
-                start = None
-    return objs
-
-
 def _extract_json(text: str) -> dict[str, Any]:
-    text = text.strip()
-    text = re.sub(r"^```(?:json)?", "", text).strip()
-    text = re.sub(r"```$", "", text).strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        s, e = text.find("{"), text.rfind("}")
-        if s != -1 and e != -1 and e > s:
-            try:
-                return json.loads(text[s : e + 1])
-            except json.JSONDecodeError:
-                pass
-        salvaged = _salvage_insights(text)
-        if salvaged:
-            return {"insights": salvaged}
-        raise
+    return loads_lenient(text, array_key="insights")
 
 
 # ---------------------------------------------------------------------------

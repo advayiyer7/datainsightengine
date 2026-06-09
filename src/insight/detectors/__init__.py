@@ -14,23 +14,23 @@ import pandas as pd
 
 from ..findings import Finding
 from .library import (
-    detect_duplicate_order,
-    detect_fragmented_orders,
-    detect_maverick_price_variance,
-    detect_single_source_risk,
+    detect_negative_or_anomalous_spend,
+    detect_new_and_churned_suppliers,
     detect_supplier_concentration,
     detect_tail_spend,
-    detect_timing_anomaly,
+    detect_yoy_spend_movers,
 )
 
+# Spend-grain detector library (one row per supplier-year). The transaction-grain
+# detectors (fragmented_orders, maverick_price_variance, single_source_risk,
+# timing_anomaly, duplicate_order) were removed in the retarget — they require
+# items/quantities/dates this data does not have.
 REGISTRY: dict[str, Callable[[pd.DataFrame, dict[str, Any]], list[Finding]]] = {
-    "fragmented_orders": detect_fragmented_orders,
     "supplier_concentration": detect_supplier_concentration,
-    "maverick_price_variance": detect_maverick_price_variance,
     "tail_spend": detect_tail_spend,
-    "single_source_risk": detect_single_source_risk,
-    "timing_anomaly": detect_timing_anomaly,
-    "duplicate_order": detect_duplicate_order,
+    "yoy_spend_movers": detect_yoy_spend_movers,
+    "negative_or_anomalous_spend": detect_negative_or_anomalous_spend,
+    "new_and_churned_suppliers": detect_new_and_churned_suppliers,
 }
 
 
@@ -56,6 +56,9 @@ def run_all(df: pd.DataFrame, detector_cfg: dict[str, Any] | None = None) -> lis
                     one_line=f"detector {name} failed: {exc}",
                 )
             )
+    # Drop 'skipped' markers (a detector whose required columns are absent) from the
+    # ranked output — they are informational, not insights.
+    findings = [f for f in findings if not f.type.endswith("_skipped")]
     findings.sort(key=lambda f: f.severity, reverse=True)
     return findings
 

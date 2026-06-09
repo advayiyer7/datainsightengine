@@ -20,15 +20,19 @@ from typing import Any
 import pandas as pd
 
 from .findings import Finding
+from .jsonx import loads_lenient
 from .llm import LLMClient
 from .sandbox import run_sandboxed
 
 SYSTEM = (
-    "You are a data-analysis agent hunting for valuable, NON-OBVIOUS procurement insights "
-    "in a pandas DataFrame named `df`. Fixed detectors already cover: fragmented orders, "
-    "supplier concentration, price variance, tail spend, single-source risk, timing anomalies, "
-    "and duplicate orders — look for something ELSE (e.g. defect-rate vs price, compliance gaps, "
-    "seasonal supplier cost drift, negotiation savings left on the table).\n\n"
+    "You are a data-analysis agent hunting for valuable, NON-OBVIOUS insights in a SUPPLIER-SPEND "
+    "pandas DataFrame named `df` (one row per supplier-year). Columns include `supplier`, `spend`, "
+    "`prev_spend` (prior-year spend). NOTE: any provided `yoy_change` / `spend_flag` columns are "
+    "NOISY (tiny prior-spend denominators) — recompute YoY robustly yourself, don't trust them. "
+    "Fixed detectors already cover: supplier concentration, tail spend, robust YoY movers, "
+    "negative/outlier spend, and new/churned suppliers — look for something ELSE (e.g. duplicate or "
+    "near-duplicate supplier names inflating the count, spend distribution shape / bimodality, "
+    "round-number clustering, mid-tier suppliers with outsized YoY swings).\n\n"
     "Each turn return ONLY JSON, one of:\n"
     "  {\"action\":\"run_code\",\"code\":\"<python>\",\"reason\":\"...\"}  -- explore; assign to `result`.\n"
     "  {\"action\":\"emit_findings\",\"findings\":[{...}],\"reason\":\"...\"}  -- report candidates.\n"
@@ -79,14 +83,7 @@ class AgenticResult:
 
 
 def _extract_json(text: str) -> dict[str, Any]:
-    text = re.sub(r"^```(?:json)?|```$", "", text.strip(), flags=re.MULTILINE).strip()
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        s, e = text.find("{"), text.rfind("}")
-        if s != -1 and e > s:
-            return json.loads(text[s : e + 1])
-        raise
+    return loads_lenient(text)
 
 
 def _schema_brief(df: pd.DataFrame) -> str:

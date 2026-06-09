@@ -1,9 +1,17 @@
-# Cheap Procurement Insight Engine
+# Cheap Procurement Insight Engine (supplier-spend grain)
 
-Surfaces **valuable, actionable procurement insights** from a purchase-order CSV —
-e.g. _"you placed 7 separate orders to Delta_Logistics for Office Supplies in 27
-days; consolidating could save ~$1,500 in shipping"_ — **cheaply**, without dumping
-the whole dataset into an LLM.
+Surfaces **valuable, actionable spend insights** from a supplier-spend CSV — e.g.
+_"top 10 suppliers account for 23% of $2.3B spend (HHI 0.01)"_, _"Bartlett & Co spend
+fell $309M (-64%) YoY"_, or _"6,293 suppliers each below $10k carry ~$3.1M in admin
+overhead"_ — **cheaply**, without dumping the whole dataset into an LLM.
+
+> **Data grain note.** This engine was retargeted from transaction-grain
+> purchase-order data to **supplier-spend grain**: one row per supplier-year with
+> `supplierName, year, totalSpend, prevYearSpend, yoyChange, flagGreaterThan50PercentChange`.
+> The architecture (schema mapping, narrator top-N selection, grounding guard, agentic
+> tier, judge-curated answer key, evaluation harness) is unchanged; only the **detector
+> library** was replaced. The engine auto-detects the grain from the schema mapping
+> (a mapped `spend` column ⇒ spend grain) and the transaction detectors are removed.
 
 ## The hypothesis this code tests
 
@@ -19,10 +27,10 @@ break that hypothesis by comparing approaches on quality vs. cost.
 
 | Tier | Module | What it does | LLM? |
 |------|--------|--------------|------|
-| **0** Ingest | `insight.ingest` | Load CSV, fuzzy-map headers to a canonical schema (config override allowed), clean/normalize, report what changed. | no |
-| **1** Detectors | `insight.detectors` | 7 deterministic pandas detectors → structured `Finding`s with real numbers + evidence. | no |
-| **2** Narrator | `insight.narrator` | Ranks/merges findings and writes plain-language recommendations using **only** finding numbers; a grounding guard catches any invented figure. | thin/cheap |
-| **3** Agentic | `insight.agentic` | Bounded, sandboxed loop that writes & runs pandas to discover novel patterns the fixed detectors miss. | optional |
+| **0** Ingest | `insight.ingest` | Load CSV, fuzzy-map headers, detect grain, clean/normalize, report a **data-quality** summary (negatives, near-zero prevYearSpend, outliers, noisy-flag share). | no |
+| **1** Detectors | `insight.detectors` | 5 deterministic pandas spend detectors → structured `Finding`s with real numbers + supplier-name evidence. | no |
+| **2** Narrator | `insight.narrator` | Merges findings per subject, ranks, narrates only the **top-N** using **only** finding numbers; a grounding guard catches any invented figure. | thin/cheap |
+| **3** Agentic | `insight.agentic` | Bounded, sandboxed loop that writes & runs pandas to discover spend patterns the fixed detectors miss. | optional |
 
 Every tier speaks the same `Finding` schema (`insight.findings`):
 
@@ -30,17 +38,24 @@ Every tier speaks the same `Finding` schema (`insight.findings`):
 Finding(type, severity, entities, metrics, evidence, est_impact_usd, one_line, source)
 ```
 
-### The 7 detectors (Tier 1)
+### The 5 spend detectors (Tier 1)
 
-1. `fragmented_orders` — same supplier+item, many orders in a rolling window → redundant shipping.
-2. `supplier_concentration` — per-category spend share + Herfindahl index → dominance risk.
-3. `maverick_price_variance` — same item bought cheaper elsewhere → overpayment vs the cheapest supplier's average.
-4. `tail_spend` — long tail of tiny orders inflating processing cost.
-5. `single_source_risk` — items sourced from exactly one supplier, weighted by spend.
-6. `timing_anomaly` — lead-time outliers vs a supplier's norm + quarter-end clustering.
-7. `duplicate_order` — near-identical orders within a short window → possible duplicate payment.
+1. `supplier_concentration` — top-N suppliers by spend, their cumulative share of total **positive** spend, and a Herfindahl-Hirschman index. Config: `top_n`.
+2. `tail_spend` — count of suppliers below a spend threshold + combined share; quantifies admin/consolidation overhead. Config: `tail_threshold_usd`, `admin_cost_per_supplier`.
+3. `yoy_spend_movers` — biggest YoY increases/decreases, computed **robustly**: `pct_change = (spend - prev_spend) / max(prev_spend, base_floor)`, surfaced only if `abs(change) ≥ min_abs_change` **and** `prev_spend ≥ base_floor` (excludes tiny-denominator noise); flags positive→negative sign flips. Config: `base_floor`, `min_abs_change`, `top_k`.
+4. `negative_or_anomalous_spend` — negative `totalSpend` (refunds/credits/errors) and statistical high outliers (`> mean + k·std`). A data-quality + anomaly finding. Config: `outlier_k`.
+5. `new_and_churned_suppliers` — prior ~0 with material current spend (new), or current ~0 with material prior (churned). Config: `near_zero`, `material`.
 
-All thresholds live in `config.yaml`; ≥3 detectors are covered by unit tests with known answers (`tests/`).
+> The transaction-grain detectors (`fragmented_orders`, `maverick_price_variance`,
+> `single_source_risk`, `timing_anomaly`, `duplicate_order`) were **removed** — they
+> need items/quantities/dates this grain doesn't have. Each spend detector guards on
+> its required columns and emits a `*_skipped` marker instead of crashing if run on
+> the wrong grain.
+
+**The provided `yoyChange` ratio and `flagGreaterThan50PercentChange` are NOT trusted**
+(tiny `prevYearSpend` denominators make ~69% of rows flag TRUE) — YoY is recomputed
+robustly. All thresholds live in `config.yaml`; 5 detectors are covered by unit tests
+including the negative-spend and tiny-prevYearSpend edge cases (`tests/`).
 
 ## Setup
 
@@ -57,22 +72,32 @@ are skipped, so every command runs end-to-end offline.
 
 ### Dataset
 
-Point the tool at any procurement / purchase-order CSV. A bundled example —
-Kaggle's **"Procurement KPI Analysis Dataset"** (`Procurement KPI Analysis
-Dataset.csv`, 777 rows) — is included. To use your own:
+The target is a **supplier-spend CSV** (`csvdata.csv`, ~12k suppliers, year 2025)
+with columns `supplierName, year, totalSpend, prevYearSpend, yoyChange,
+flagGreaterThan50PercentChange`. `config.yaml` already maps it:
 
-1. Download a procurement CSV (e.g. Kaggle "Procurement KPI Analysis Dataset" or
-   "Company Purchasing Dataset").
-2. Run `insight ingest --data your.csv` and read the **resolved schema mapping**.
-3. If a column was mis-guessed, correct it in `config.yaml` under `column_map:`
-   (`canonical_field: Your_Header`). Required fields: `supplier`, `item`,
-   `quantity`, `order_date`, and one of `unit_price`/`total`.
+```yaml
+column_map:
+  supplier: supplierName
+  spend: totalSpend
+  prev_spend: prevYearSpend
+  yoy_change: yoyChange        # carried but NOT trusted (noisy)
+  year: year
+  spend_flag: flagGreaterThan50PercentChange   # NOT trusted (~69% TRUE)
+```
 
-> **Note on this dataset:** it has no SKU column, so `item` falls back to
-> `Item_Category` (5 broad categories). `maverick_price_variance` therefore
-> benchmarks the cheapest *supplier average* per category rather than per-SKU
-> prices — its dollar figures are an **upper bound** on savings, not a precise
-> number. This caveat is surfaced in `RESULTS.md` too.
+A mapped `spend` column switches the engine to spend grain. Required fields:
+`supplier`, `spend`, `prev_spend`. To use your own spend CSV, run
+`insight ingest --data your.csv`, read the **resolved schema mapping + data-quality
+report**, and correct any mis-guessed header under `column_map:`.
+
+> **Known data-quality issues (handled, not hidden):** `totalSpend` includes
+> **negative** values (refunds/credits/adjustments or errors, down to ~-$197k) —
+> surfaced by `negative_or_anomalous_spend`, never netted away. `prevYearSpend` has
+> near-zero (cents) values that make the provided `yoyChange` explode and flag ~69%
+> of rows — so the **provided flag and raw ratio are ignored** and YoY is recomputed
+> robustly. It is a **single year**, so "trend" means the in-row prevYearSpend
+> comparison. `ingest` prints all of these counts.
 
 ## CLI
 
@@ -146,9 +171,9 @@ pytest        # detector unit tests + grounding-guard tests
 
 ```
 src/insight/
-  config.py      ingest.py     findings.py    llm.py
-  detectors/     narrator.py   grounding.py   sandbox.py
+  config.py      ingest.py     findings.py    llm.py       jsonx.py
+  detectors/     narrator.py   grounding.py   sandbox.py    selection.py
   agentic.py     baseline.py   judge.py       answer_key.py
   evaluate.py    cli.py
-tests/           config.yaml   pyproject.toml
+tests/           config.yaml   csvdata.csv    pyproject.toml
 ```

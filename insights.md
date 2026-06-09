@@ -1,54 +1,58 @@
 # Procurement Insights Report
 
-_Generated via LLM narrator (Claude Haiku). Showing the top 8 selected insights (merged & ranked from the full detector set)._
-_Grounding: 75/75 cited numbers traced to findings ✓ all grounded._
+_Generated via deterministic fallback (no API key). Showing the top 8 selected insights (merged & ranked from the full detector set)._
+_Grounding: 37/38 cited numbers traced to findings — 1 still ungrounded after repair (was 0)._
 
-**Total flagged impact across selected insights: ~$12,054,453**
+**Total flagged impact across selected insights: ~$1,123,360,306**
 
-## 1. Office Supplies: Consolidate to Beta_Supplies to Eliminate 21% Price Premium  (est. impact ~$2,598,774)
-- **What:** Alpha_Inc charges $60.66/unit for Office Supplies versus Beta_Supplies at $50.03/unit—a 21% premium across 174 orders. Additionally, 6 fragmented orders to Alpha_Inc within 29 days incur redundant shipping costs.
-- **Why it matters:** Paying 21% above the best-available price wastes procurement budget. Fragmented ordering multiplies handling overhead. Combined, these inefficiencies cost approximately $2,598,774 in overpayment plus $1,250 in excess shipping.
-- **Suggested action:** Redirect all Office Supplies volume from Alpha_Inc to Beta_Supplies and consolidate the 6 orders placed within 29 days into a single purchase to capture the $50.03/unit benchmark price and eliminate redundant shipping fees.
-- _Sources: fragmented_orders, maverick_price_variance_
+## 1. Yoy Spend Movers  (est. impact ~$309,389,563)
+- **What:** Bartlett and Company of Mexico spend fell $309,389,563 (-64%) YoY ($482,988,239 → $173,598,675).
+- **Why it matters:** Estimated impact $309,389,563. Related signals: negative_or_anomalous_spend, yoy_spend_movers.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: negative_or_anomalous_spend, yoy_spend_movers_
 
-## 2. MRO: Shift Volume from Delta_Logistics (17% Premium) to Alpha_Inc  (est. impact ~$2,526,625)
-- **What:** Delta_Logistics averages $58.29/unit for MRO versus Alpha_Inc's $49.94/unit—a 17% price spread across 164 orders. Four fragmented orders to Delta_Logistics within 28 days create additional shipping waste.
-- **Why it matters:** The 17% unit-price premium costs approximately $2,526,625 in avoidable overpayment. Fragmented ordering adds $750 in unnecessary shipping and handling charges, and prevents volume discounts.
-- **Suggested action:** Consolidate MRO procurement to Alpha_Inc and merge the 4 orders placed within 28 days into a single consolidated purchase to achieve the $49.94/unit benchmark and eliminate $750 in redundant shipping costs.
-- _Sources: fragmented_orders, maverick_price_variance_
+## 2. Yoy Spend Movers  (est. impact ~$114,580,881)
+- **What:** C Vale - Agroindustrial Cooperative spend rose $111,630,455 (+3784%) YoY ($2,950,426 → $114,580,881).
+- **Why it matters:** Estimated impact $114,580,881. Related signals: negative_or_anomalous_spend, yoy_spend_movers.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: negative_or_anomalous_spend, yoy_spend_movers_
 
-## 3. Packaging: Eliminate 25% Price Variance by Consolidating to Alpha_Inc  (est. impact ~$2,420,531)
-- **What:** Epsilon_Group charges $54.53/unit for Packaging compared to Alpha_Inc's $43.60/unit—a 25% premium across 148 orders. Five orders to Epsilon_Group within 25 days are fragmented and incur duplicate shipping.
-- **Why it matters:** The 25% unit-price premium represents approximately $2,420,531 in overpayment. Fragmented ordering adds $1,000 in excess shipping costs and prevents economies of scale.
-- **Suggested action:** Consolidate all Packaging volume to Alpha_Inc and merge the 5 orders placed within 25 days into a single purchase to lock in the $43.60/unit price and recover $1,000 in shipping savings.
-- _Sources: fragmented_orders, maverick_price_variance_
+## 3. Yoy Spend Movers  (est. impact ~$100,999,179)
+- **What:** ROQUETTE LTD spend fell $100,999,179 (-89%) YoY ($113,521,379 → $12,522,200).
+- **Why it matters:** Estimated impact $100,999,179.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: yoy_spend_movers_
 
-## 4. Electronics: Eliminate Duplicate Order and Consolidate to Delta_Logistics  (est. impact ~$2,354,746)
-- **What:** Beta_Supplies charges $56.61/unit for Electronics versus Delta_Logistics at $46.45/unit—a 22% premium across 152 orders. Two near-identical orders (~$165,110 each) were placed 3 days apart to Beta_Supplies, suggesting a duplicate. Additionally, 6 fragmented orders within 27 days incur redundant shipping.
-- **Why it matters:** The 22% unit-price premium costs approximately $2,354,746 in overpayment. The duplicate order (~$165,110) represents wasted spend that should be recovered. Fragmented ordering adds $1,250 in excess shipping and prevents consolidation discounts.
-- **Suggested action:** Cancel or return the duplicate order placed 3 days apart; redirect all Electronics volume to Delta_Logistics; consolidate the 6 orders placed within 27 days into a single purchase to achieve the $46.45/unit benchmark and recover $1,250 in shipping savings.
-- _Sources: duplicate_order, fragmented_orders, maverick_price_variance_
+## 4. Supplier Concentration  (est. impact ~$519,879,381)
+- **What:** Top 10 suppliers account for 23% of $2,292,859,147 total positive spend (HHI 0.011, 11920 suppliers); largest is Bartlett and Company of Mexico at $173,598,675.
+- **Why it matters:** Estimated impact $519,879,381.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: supplier_concentration_
 
-## 5. Raw Materials: Shift from Alpha_Inc (32% Premium) to Epsilon_Group  (est. impact ~$2,135,427)
-- **What:** Alpha_Inc averages $63.93/unit for Raw Materials versus Epsilon_Group's $48.54/unit—a 32% price premium across 139 orders. Three orders to Alpha_Inc within 16 days are fragmented and incur duplicate shipping.
-- **Why it matters:** The 32% unit-price premium costs approximately $2,135,427 in avoidable overpayment—the largest variance in the portfolio. Fragmented ordering adds $500 in excess shipping and prevents volume leverage.
-- **Suggested action:** Consolidate all Raw Materials procurement to Epsilon_Group and merge the 3 orders placed within 16 days into a single purchase to achieve the $48.54/unit benchmark and recover $500 in shipping savings.
-- _Sources: fragmented_orders, maverick_price_variance_
+## 5. Negative Or Anomalous Spend  (est. impact ~$45,691,834)
+- **What:** FARM CITY ELEVATOR INC spend $45,691,834 is a statistical outlier (20.8σ above the $192,354 mean) — concentration / data-quality check.
+- **Why it matters:** Estimated impact $45,691,834.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: negative_or_anomalous_spend_
 
-## 6. Tail Spend: Consolidate 156 Small Orders to Reduce Processing Overhead  (est. impact ~$15,600)
-- **What:** 156 small orders, each valued at or below $18,175, collectively represent only 3.7% of total spend but incur approximately $15,600 in processing costs.
-- **Why it matters:** Small, fragmented orders consume disproportionate procurement resources (labor, systems, vendor management) relative to their spend contribution. Consolidation reduces per-unit processing overhead and improves efficiency.
-- **Suggested action:** Implement a tail-spend consolidation program to bundle the 156 small orders into fewer, larger purchases with preferred suppliers, targeting a reduction in processing costs of approximately $15,600.
+## 6. Negative Or Anomalous Spend  (est. impact ~$28,479,332)
+- **What:** THE DELONG CO INC spend $28,479,332 is a statistical outlier (13.0σ above the $192,354 mean) — concentration / data-quality check.
+- **Why it matters:** Estimated impact $28,479,332.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: negative_or_anomalous_spend_
+
+## 7. Tail Spend  (est. impact ~$3,146,500)
+- **What:** 6293 suppliers each below $10,000 make up only 0.8% of $2,292,858,816 spend but carry ~$3,146,500 in admin overhead (~$500/supplier) — consolidation candidate.
+- **Why it matters:** Estimated impact $3,146,500.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
 - _Sources: tail_spend_
 
-## 7. Office Supplies via Delta_Logistics: Consolidate 7 Fragmented Orders  (est. impact ~$1,500)
-- **What:** Seven separate orders to Delta_Logistics for Office Supplies were placed within 27 days, creating redundant shipping and handling charges.
-- **Why it matters:** Fragmented ordering to the same supplier within a short window multiplies shipping costs and prevents volume discounts. Consolidation saves approximately $1,500 in excess shipping.
-- **Suggested action:** Consolidate the 7 Office Supplies orders to Delta_Logistics placed within 27 days into a single purchase to eliminate $1,500 in redundant shipping and handling fees.
-- _Sources: fragmented_orders_
+## 8. New And Churned Suppliers  (est. impact ~$1,193,635)
+- **What:** SIEMENS INDUSTRIAL TURBOMACHINERY L appears CHURNED: $1,193,635 prior → ~$0 current spend.
+- **Why it matters:** Estimated impact $1,193,635.
+- **Suggested action:** Review the evidence rows and address the flagged pattern.
+- _Sources: new_and_churned_suppliers_
 
-## 8. Packaging via Delta_Logistics: Consolidate 6 Fragmented Orders  (est. impact ~$1,250)
-- **What:** Six separate orders to Delta_Logistics for Packaging were placed within 28 days, incurring duplicate shipping and handling costs.
-- **Why it matters:** Fragmented ordering multiplies per-unit shipping overhead and prevents consolidation discounts. Merging these orders saves approximately $1,250 in excess shipping.
-- **Suggested action:** Consolidate the 6 Packaging orders to Delta_Logistics placed within 28 days into a single purchase to recover $1,250 in shipping savings.
-- _Sources: fragmented_orders_
+---
+> ⚠ **Figures the grounding guard could not trace (left flagged, not trusted):**
+> - `3784%`

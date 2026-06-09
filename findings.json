@@ -1,901 +1,776 @@
 [
   {
-    "type": "maverick_price_variance",
-    "severity": 0.9356861252399629,
+    "type": "yoy_spend_movers",
+    "severity": 0.9942194594443649,
     "entities": {
-      "item": "Office Supplies",
-      "best_supplier": "Beta_Supplies",
-      "worst_supplier": "Alpha_Inc"
+      "supplier": "Bartlett and Company of Mexico",
+      "direction": "fell"
     },
     "metrics": {
-      "benchmark_unit_price": 50.03,
-      "worst_supplier_mean_price": 60.66,
-      "spread_pct": 0.212,
-      "suppliers_compared": 5,
-      "orders": 174,
-      "est_overpayment_vs_cheapest_supplier": 2598773.99
+      "spend": 173598675.37,
+      "prev_spend": 482988238.8,
+      "dollar_change": -309389563.43,
+      "pct_change": -0.6406,
+      "sign_flip": false
     },
     "evidence": {
-      "supplier_mean_price": {
-        "Alpha_Inc": 60.66,
-        "Beta_Supplies": 50.03,
-        "Delta_Logistics": 57.69,
-        "Epsilon_Group": 56.2,
-        "Gamma_Co": 55.94
-      },
-      "supplier_orders": {
-        "Alpha_Inc": 39,
-        "Beta_Supplies": 41,
-        "Delta_Logistics": 37,
-        "Epsilon_Group": 34,
-        "Gamma_Co": 23
-      }
+      "row_id": "row_5872"
     },
-    "est_impact_usd": 2598773.99,
-    "one_line": "For Office Supplies, Alpha_Inc averages $60.66/unit vs Beta_Supplies's $50.03 (21% higher); shifting volume to the cheapest supplier could save up to ~$2,598,774.",
+    "est_impact_usd": 309389563.43,
+    "one_line": "Bartlett and Company of Mexico spend fell $309,389,563 (-64%) YoY ($482,988,239 \u2192 $173,598,675).",
     "source": "detector"
   },
   {
-    "type": "maverick_price_variance",
-    "severity": 0.9339843251847305,
+    "type": "yoy_spend_movers",
+    "severity": 0.9841591762711922,
     "entities": {
-      "item": "MRO",
-      "best_supplier": "Alpha_Inc",
-      "worst_supplier": "Delta_Logistics"
+      "supplier": "C Vale - Agroindustrial Cooperative",
+      "direction": "rose"
     },
     "metrics": {
-      "benchmark_unit_price": 49.94,
-      "worst_supplier_mean_price": 58.29,
-      "spread_pct": 0.167,
-      "suppliers_compared": 5,
-      "orders": 164,
-      "est_overpayment_vs_cheapest_supplier": 2526625.16
+      "spend": 114580880.55,
+      "prev_spend": 2950426.05,
+      "dollar_change": 111630454.5,
+      "pct_change": 37.8354,
+      "sign_flip": false
     },
     "evidence": {
-      "supplier_mean_price": {
-        "Alpha_Inc": 49.94,
-        "Beta_Supplies": 55.24,
-        "Delta_Logistics": 58.29,
-        "Epsilon_Group": 56.61,
-        "Gamma_Co": 58.0
-      },
-      "supplier_orders": {
-        "Alpha_Inc": 35,
-        "Beta_Supplies": 26,
-        "Delta_Logistics": 34,
-        "Epsilon_Group": 39,
-        "Gamma_Co": 30
-      }
+      "row_id": "row_45"
     },
-    "est_impact_usd": 2526625.16,
-    "one_line": "For MRO, Delta_Logistics averages $58.29/unit vs Alpha_Inc's $49.94 (17% higher); shifting volume to the cheapest supplier could save up to ~$2,526,625.",
+    "est_impact_usd": 111630454.5,
+    "one_line": "C Vale - Agroindustrial Cooperative spend rose $111,630,455 (+3784%) YoY ($2,950,426 \u2192 $114,580,881).",
     "source": "detector"
   },
   {
-    "type": "maverick_price_variance",
-    "severity": 0.9313116256892068,
+    "type": "yoy_spend_movers",
+    "severity": 0.9825241325585016,
     "entities": {
-      "item": "Packaging",
-      "best_supplier": "Alpha_Inc",
-      "worst_supplier": "Epsilon_Group"
+      "supplier": "ROQUETTE LTD",
+      "direction": "fell"
     },
     "metrics": {
-      "benchmark_unit_price": 43.6,
-      "worst_supplier_mean_price": 54.53,
-      "spread_pct": 0.251,
-      "suppliers_compared": 5,
-      "orders": 148,
-      "est_overpayment_vs_cheapest_supplier": 2420530.79
+      "spend": 12522200.08,
+      "prev_spend": 113521379.15,
+      "dollar_change": -100999179.07,
+      "pct_change": -0.8897,
+      "sign_flip": false
     },
     "evidence": {
-      "supplier_mean_price": {
-        "Alpha_Inc": 43.6,
-        "Beta_Supplies": 46.27,
-        "Delta_Logistics": 47.19,
-        "Epsilon_Group": 54.53,
-        "Gamma_Co": 53.51
-      },
-      "supplier_orders": {
-        "Alpha_Inc": 27,
-        "Beta_Supplies": 30,
-        "Delta_Logistics": 29,
-        "Epsilon_Group": 34,
-        "Gamma_Co": 28
-      }
+      "row_id": "row_2240"
     },
-    "est_impact_usd": 2420530.79,
-    "one_line": "For Packaging, Epsilon_Group averages $54.53/unit vs Alpha_Inc's $43.60 (25% higher); shifting volume to the cheapest supplier could save up to ~$2,420,531.",
+    "est_impact_usd": 100999179.07,
+    "one_line": "ROQUETTE LTD spend fell $100,999,179 (-89%) YoY ($113,521,379 \u2192 $12,522,200).",
     "source": "detector"
   },
   {
-    "type": "maverick_price_variance",
-    "severity": 0.9295429052195455,
+    "type": "yoy_spend_movers",
+    "severity": 0.9730672260231551,
     "entities": {
-      "item": "Electronics",
-      "best_supplier": "Delta_Logistics",
-      "worst_supplier": "Beta_Supplies"
+      "supplier": "THE SCOULAR COMPANY",
+      "direction": "fell"
     },
     "metrics": {
-      "benchmark_unit_price": 46.45,
-      "worst_supplier_mean_price": 56.61,
-      "spread_pct": 0.219,
-      "suppliers_compared": 5,
-      "orders": 152,
-      "est_overpayment_vs_cheapest_supplier": 2354746.27
+      "spend": 40816225.96,
+      "prev_spend": 105649297.13,
+      "dollar_change": -64833071.17,
+      "pct_change": -0.6137,
+      "sign_flip": false
     },
     "evidence": {
-      "supplier_mean_price": {
-        "Alpha_Inc": 51.03,
-        "Beta_Supplies": 56.61,
-        "Delta_Logistics": 46.45,
-        "Epsilon_Group": 55.01,
-        "Gamma_Co": 47.46
-      },
-      "supplier_orders": {
-        "Alpha_Inc": 22,
-        "Beta_Supplies": 32,
-        "Delta_Logistics": 33,
-        "Epsilon_Group": 36,
-        "Gamma_Co": 29
-      }
+      "row_id": "row_6381"
     },
-    "est_impact_usd": 2354746.27,
-    "one_line": "For Electronics, Beta_Supplies averages $56.61/unit vs Delta_Logistics's $46.45 (22% higher); shifting volume to the cheapest supplier could save up to ~$2,354,746.",
-    "source": "detector"
-  },
-  {
-    "type": "duplicate_order",
-    "severity": 0.9243694328474572,
-    "entities": {
-      "supplier": "Beta_Supplies",
-      "item": "Electronics"
-    },
-    "metrics": {
-      "amount": 165110.34,
-      "days_apart": 3,
-      "order_total_a": 163481.65,
-      "order_total_b": 165110.34
-    },
-    "evidence": {
-      "row_ids": [
-        "PO-00095",
-        "PO-00115"
-      ]
-    },
-    "est_impact_usd": 165110.34,
-    "one_line": "Two near-identical orders to Beta_Supplies for Electronics (~$165,110) placed 3 day(s) apart \u2014 possible duplicate.",
-    "source": "detector"
-  },
-  {
-    "type": "maverick_price_variance",
-    "severity": 0.9229262851362205,
-    "entities": {
-      "item": "Raw Materials",
-      "best_supplier": "Epsilon_Group",
-      "worst_supplier": "Alpha_Inc"
-    },
-    "metrics": {
-      "benchmark_unit_price": 48.54,
-      "worst_supplier_mean_price": 63.93,
-      "spread_pct": 0.317,
-      "suppliers_compared": 5,
-      "orders": 139,
-      "est_overpayment_vs_cheapest_supplier": 2135426.55
-    },
-    "evidence": {
-      "supplier_mean_price": {
-        "Alpha_Inc": 63.93,
-        "Beta_Supplies": 62.07,
-        "Delta_Logistics": 48.87,
-        "Epsilon_Group": 48.54,
-        "Gamma_Co": 58.24
-      },
-      "supplier_orders": {
-        "Alpha_Inc": 18,
-        "Beta_Supplies": 27,
-        "Delta_Logistics": 38,
-        "Epsilon_Group": 23,
-        "Gamma_Co": 33
-      }
-    },
-    "est_impact_usd": 2135426.55,
-    "one_line": "For Raw Materials, Alpha_Inc averages $63.93/unit vs Epsilon_Group's $48.54 (32% higher); shifting volume to the cheapest supplier could save up to ~$2,135,427.",
+    "est_impact_usd": 64833071.17,
+    "one_line": "THE SCOULAR COMPANY spend fell $64,833,071 (-61%) YoY ($105,649,297 \u2192 $40,816,226).",
     "source": "detector"
   },
   {
     "type": "tail_spend",
-    "severity": 0.7815533980582524,
+    "severity": 0.9722778376713384,
     "entities": {},
     "metrics": {
-      "tail_orders": 156,
-      "order_value_threshold": 18175.1,
-      "tail_spend": 1666308.47,
-      "tail_share_of_spend": 0.0367,
-      "est_processing_cost": 15600.0
+      "tail_suppliers": 6293,
+      "spend_threshold": 10000.0,
+      "tail_spend": 18081246.02,
+      "tail_share_of_spend": 0.0079,
+      "admin_cost_per_supplier": 500.0,
+      "est_admin_overhead": 3146500.0
     },
     "evidence": {
-      "tail_suppliers": {
-        "Beta_Supplies": 40,
-        "Delta_Logistics": 38,
-        "Epsilon_Group": 30,
-        "Alpha_Inc": 28,
-        "Gamma_Co": 20
-      },
-      "row_ids": [
-        "PO-00010",
-        "PO-00020",
-        "PO-00028",
-        "PO-00031",
-        "PO-00035",
-        "PO-00041",
-        "PO-00048",
-        "PO-00050",
-        "PO-00052",
-        "PO-00062",
-        "PO-00064",
-        "PO-00068",
-        "PO-00069",
-        "PO-00076",
-        "PO-00078",
-        "PO-00083",
-        "PO-00084",
-        "PO-00089",
-        "PO-00101",
-        "PO-00102",
-        "PO-00106",
-        "PO-00107",
-        "PO-00118",
-        "PO-00120",
-        "PO-00125"
-      ]
+      "example_tail_suppliers": {
+        "Pingyuan County Dajun Machinery Manufacturing and Repair Department": 0.0,
+        "Rb Training and Development": 0.0,
+        "Martin Engineering Mexico": 0.0,
+        "NORTHPOINT TECHNICAL SERVICES": 0.0,
+        "WIRSAM SCIENTIFIC AND PRECISION": 0.0,
+        "KENCO LOGISTICS SERVICES LLC": 0.0,
+        "Flavia Simoes Luz Ltda": 0.0,
+        "Shenzhen Bocheng Customs Clearance Service Co., Ltd.": 0.0,
+        "hsp Commercial Software Partners GmbH": 0.0,
+        "EHS Business Consulting Services": 0.0,
+        "FedEx Express International": 0.0,
+        "TILLEKE & GIBBINS INTERNATIONAL": 0.0,
+        "W L PETERS APPLIANCE CO LTD": 0.0,
+        "EAGLE BURGMANN (THAILAND) LTD.": 0.0,
+        "J C DILLON INC": 0.0
+      }
     },
-    "est_impact_usd": 15600.0,
-    "one_line": "156 small orders (each <= $18,175) make up only 3.7% of spend but cost ~$15,600 to process \u2014 consolidation candidate.",
+    "est_impact_usd": 3146500.0,
+    "one_line": "6293 suppliers each below $10,000 make up only 0.8% of $2,292,858,816 spend but carry ~$3,146,500 in admin overhead (~$500/supplier) \u2014 consolidation candidate.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.3076923076923077,
+    "type": "yoy_spend_movers",
+    "severity": 0.9648491760296866,
     "entities": {
-      "supplier": "Delta_Logistics",
-      "item": "Office Supplies"
+      "supplier": "Eiamheng Tapioca Starch Industry",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 7,
-      "window_days": 27,
-      "redundant_orders": 6,
-      "est_extra_shipping": 1500.0
+      "spend": 15329.38,
+      "prev_spend": 49223232.82,
+      "dollar_change": -49207903.45,
+      "pct_change": -0.9997,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00337",
-        "PO-00242",
-        "PO-00252",
-        "PO-00744",
-        "PO-00273",
-        "PO-00620",
-        "PO-00501"
-      ]
+      "row_id": "row_934"
     },
-    "est_impact_usd": 1500.0,
-    "one_line": "7 separate orders to Delta_Logistics for Office Supplies within 27 days; consolidating could save ~$1,500 in shipping/handling.",
+    "est_impact_usd": 49207903.45,
+    "one_line": "Eiamheng Tapioca Starch Industry spend fell $49,207,903 (-100%) YoY ($49,223,233 \u2192 $15,329).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.28,
+    "type": "yoy_spend_movers",
+    "severity": 0.9494976234124283,
     "entities": {
-      "supplier": "Delta_Logistics",
-      "item": "Packaging"
+      "supplier": "NORFOLK SOUTHERN CORPORATION",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 6,
-      "window_days": 28,
-      "redundant_orders": 5,
-      "est_extra_shipping": 1250.0
+      "spend": 22320890.99,
+      "prev_spend": 55962778.0,
+      "dollar_change": -33641887.01,
+      "pct_change": -0.6011,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00414",
-        "PO-00721",
-        "PO-00164",
-        "PO-00118",
-        "PO-00081",
-        "PO-00491"
-      ]
+      "row_id": "row_6657"
     },
-    "est_impact_usd": 1250.0,
-    "one_line": "6 separate orders to Delta_Logistics for Packaging within 28 days; consolidating could save ~$1,250 in shipping/handling.",
+    "est_impact_usd": 33641887.01,
+    "one_line": "NORFOLK SOUTHERN CORPORATION spend fell $33,641,887 (-60%) YoY ($55,962,778 \u2192 $22,320,891).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.28,
+    "type": "yoy_spend_movers",
+    "severity": 0.948014373556651,
     "entities": {
-      "supplier": "Epsilon_Group",
-      "item": "Electronics"
+      "supplier": "Trevisan Agrobusiness Trade Impex",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 6,
-      "window_days": 30,
-      "redundant_orders": 5,
-      "est_extra_shipping": 1250.0
+      "spend": 25597883.21,
+      "prev_spend": 58222838.66,
+      "dollar_change": -32624955.46,
+      "pct_change": -0.5603,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00347",
-        "PO-00206",
-        "PO-00125",
-        "PO-00443",
-        "PO-00160",
-        "PO-00277"
-      ]
+      "row_id": "row_7447"
     },
-    "est_impact_usd": 1250.0,
-    "one_line": "6 separate orders to Epsilon_Group for Electronics within 30 days; consolidating could save ~$1,250 in shipping/handling.",
+    "est_impact_usd": 32624955.46,
+    "one_line": "Trevisan Agrobusiness Trade Impex spend fell $32,624,955 (-56%) YoY ($58,222,839 \u2192 $25,597,883).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.28,
+    "type": "yoy_spend_movers",
+    "severity": 0.9468111569599066,
     "entities": {
-      "supplier": "Alpha_Inc",
-      "item": "Office Supplies"
+      "supplier": "AGRANA STARKE GMBH",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 6,
-      "window_days": 29,
-      "redundant_orders": 5,
-      "est_extra_shipping": 1250.0
+      "spend": 21179472.39,
+      "prev_spend": 53021156.04,
+      "dollar_change": -31841683.65,
+      "pct_change": -0.6005,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00450",
-        "PO-00298",
-        "PO-00236",
-        "PO-00102",
-        "PO-00652",
-        "PO-00357"
-      ]
+      "row_id": "row_6666"
     },
-    "est_impact_usd": 1250.0,
-    "one_line": "6 separate orders to Alpha_Inc for Office Supplies within 29 days; consolidating could save ~$1,250 in shipping/handling.",
+    "est_impact_usd": 31841683.65,
+    "one_line": "AGRANA STARKE GMBH spend fell $31,841,684 (-60%) YoY ($53,021,156 \u2192 $21,179,472).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.28,
+    "type": "yoy_spend_movers",
+    "severity": 0.9342868412935058,
     "entities": {
-      "supplier": "Beta_Supplies",
-      "item": "Office Supplies"
+      "supplier": "CARGILL INC",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 6,
-      "window_days": 27,
-      "redundant_orders": 5,
-      "est_extra_shipping": 1250.0
+      "spend": 4435910.33,
+      "prev_spend": 29827684.45,
+      "dollar_change": -25391774.12,
+      "pct_change": -0.8513,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00531",
-        "PO-00214",
-        "PO-00151",
-        "PO-00099",
-        "PO-00409",
-        "PO-00777"
-      ]
+      "row_id": "row_2682"
     },
-    "est_impact_usd": 1250.0,
-    "one_line": "6 separate orders to Beta_Supplies for Office Supplies within 27 days; consolidating could save ~$1,250 in shipping/handling.",
+    "est_impact_usd": 25391774.12,
+    "one_line": "CARGILL INC spend fell $25,391,774 (-85%) YoY ($29,827,684 \u2192 $4,435,910).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.28,
+    "type": "yoy_spend_movers",
+    "severity": 0.9325305498590257,
     "entities": {
-      "supplier": "Beta_Supplies",
-      "item": "Electronics"
+      "supplier": "RJ Obrien & Associates LLC",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 6,
-      "window_days": 27,
-      "redundant_orders": 5,
-      "est_extra_shipping": 1250.0
+      "spend": 5069199.32,
+      "prev_spend": 29747940.54,
+      "dollar_change": -24678741.21,
+      "pct_change": -0.8296,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00373",
-        "PO-00122",
-        "PO-00688",
-        "PO-00055",
-        "PO-00619",
-        "PO-00754"
-      ]
+      "row_id": "row_2953"
     },
-    "est_impact_usd": 1250.0,
-    "one_line": "6 separate orders to Beta_Supplies for Electronics within 27 days; consolidating could save ~$1,250 in shipping/handling.",
+    "est_impact_usd": 24678741.21,
+    "one_line": "RJ Obrien & Associates LLC spend fell $24,678,741 (-83%) YoY ($29,747,941 \u2192 $5,069,199).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "yoy_spend_movers",
+    "severity": 0.9320022089977561,
     "entities": {
-      "supplier": "Gamma_Co",
-      "item": "Packaging"
+      "supplier": "Cargill de Mexico S.A. de C.V.",
+      "direction": "fell"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 27,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 25802061.45,
+      "prev_spend": 50273509.61,
+      "dollar_change": -24471448.17,
+      "pct_change": -0.4868,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00604",
-        "PO-00412",
-        "PO-00241",
-        "PO-00523",
-        "PO-00643"
-      ]
+      "row_id": "row_8580"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Gamma_Co for Packaging within 27 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 24471448.17,
+    "one_line": "Cargill de Mexico S.A. de C.V. spend fell $24,471,448 (-49%) YoY ($50,273,510 \u2192 $25,802,061).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.9276854556303498,
     "entities": {
-      "supplier": "Epsilon_Group",
-      "item": "MRO"
+      "signal": "high_outlier",
+      "supplier": "Bartlett and Company of Mexico"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 18,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 173598675.37,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 79.4,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00044",
-        "PO-00272",
-        "PO-00135",
-        "PO-00185",
-        "PO-00753"
-      ]
+      "supplier": "Bartlett and Company of Mexico"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Epsilon_Group for MRO within 18 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 173598675.37,
+    "one_line": "Bartlett and Company of Mexico spend $173,598,675 is a statistical outlier (79.4\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.895973336312055,
     "entities": {
-      "supplier": "Gamma_Co",
-      "item": "Electronics"
+      "signal": "high_outlier",
+      "supplier": "C Vale - Agroindustrial Cooperative"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 14,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 114580880.55,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 52.38,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00322",
-        "PO-00189",
-        "PO-00320",
-        "PO-00530",
-        "PO-00232"
-      ]
+      "supplier": "C Vale - Agroindustrial Cooperative"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Gamma_Co for Electronics within 14 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 114580880.55,
+    "one_line": "C Vale - Agroindustrial Cooperative spend $114,580,881 is a statistical outlier (52.4\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "yoy_spend_movers",
+    "severity": 0.8643330318176042,
     "entities": {
-      "supplier": "Epsilon_Group",
-      "item": "Packaging"
+      "supplier": "EIAM E-SAN TAPIOCA STARCH INDUSTRY",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 25,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 17121905.75,
+      "prev_spend": 5854121.97,
+      "dollar_change": 11267783.78,
+      "pct_change": 1.9248,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00381",
-        "PO-00681",
-        "PO-00515",
-        "PO-00304",
-        "PO-00709"
-      ]
+      "row_id": "row_582"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Epsilon_Group for Packaging within 25 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 11267783.78,
+    "one_line": "EIAM E-SAN TAPIOCA STARCH INDUSTRY spend rose $11,267,784 (+192%) YoY ($5,854,122 \u2192 $17,121,906).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "yoy_spend_movers",
+    "severity": 0.8298617483591737,
     "entities": {
-      "supplier": "Epsilon_Group",
-      "item": "Office Supplies"
+      "supplier": "Valley Agro Industry and Trade",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 30,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 10658968.51,
+      "prev_spend": 2079337.05,
+      "dollar_change": 8579631.46,
+      "pct_change": 4.1261,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00728",
-        "PO-00144",
-        "PO-00676",
-        "PO-00105",
-        "PO-00541"
-      ]
+      "row_id": "row_323"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Epsilon_Group for Office Supplies within 30 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 8579631.46,
+    "one_line": "Valley Agro Industry and Trade spend rose $8,579,631 (+413%) YoY ($2,079,337 \u2192 $10,658,969).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.7868837090387117,
     "entities": {
-      "supplier": "Beta_Supplies",
-      "item": "Packaging"
+      "signal": "high_outlier",
+      "supplier": "FARM CITY ELEVATOR INC"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 26,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 45691833.96,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 20.83,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00274",
-        "PO-00527",
-        "PO-00665",
-        "PO-00246",
-        "PO-00316"
-      ]
+      "supplier": "FARM CITY ELEVATOR INC"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Beta_Supplies for Packaging within 26 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 45691833.96,
+    "one_line": "FARM CITY ELEVATOR INC spend $45,691,834 is a statistical outlier (20.8\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.7697982770386299,
     "entities": {
-      "supplier": "Gamma_Co",
-      "item": "Raw Materials"
+      "signal": "high_outlier",
+      "supplier": "THE SCOULAR COMPANY"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 25,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 40816225.96,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 18.6,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00741",
-        "PO-00112",
-        "PO-00199",
-        "PO-00712",
-        "PO-00009"
-      ]
+      "supplier": "THE SCOULAR COMPANY"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Gamma_Co for Raw Materials within 25 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 40816225.96,
+    "one_line": "THE SCOULAR COMPANY spend $40,816,226 is a statistical outlier (18.6\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.7285378136858995,
     "entities": {
-      "supplier": "Alpha_Inc",
-      "item": "MRO"
+      "signal": "negative_spend",
+      "largest": "COPAM Portuguese Company of Starch"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 19,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "negative_suppliers": 34,
+      "total_negative_spend": -315725.6,
+      "most_negative_value": -197376.71
     },
     "evidence": {
-      "row_ids": [
-        "PO-00708",
-        "PO-00713",
-        "PO-00438",
-        "PO-00519",
-        "PO-00064"
-      ]
+      "negative_suppliers": {
+        "COPAM Portuguese Company of Starch": -197376.71,
+        "DELOITTE CONSULTING LLP": -32100.0,
+        "PPG ARCHITECTURAL FINISHES INC": -14858.0,
+        "CONSOLIDATED AGRI-AGENTS": -11012.08,
+        "VLS ENVIRONMENTAL SOLUTIONS LLC VLS": -10683.99,
+        "FIELD INSTRUMENTS & CONTROLS INC": -9594.56,
+        "DESCARTES VISUAL COMPLIANCE INC": -8334.74,
+        "NEW VISION DIGITAL TECHNOLOGY LTD.": -4856.32
+      }
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Alpha_Inc for MRO within 19 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 315725.6,
+    "one_line": "34 suppliers have negative total spend (refunds/credits/adjustments or errors) totaling $-315,726; most negative is COPAM Portuguese Company of Starch at $-197,377 \u2014 verify.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.711217143604171,
     "entities": {
-      "supplier": "Gamma_Co",
-      "item": "Office Supplies"
+      "signal": "high_outlier",
+      "supplier": "THE DELONG CO INC"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 28,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 28479332.1,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 12.95,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00738",
-        "PO-00066",
-        "PO-00646",
-        "PO-00469",
-        "PO-00148"
-      ]
+      "supplier": "THE DELONG CO INC"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Gamma_Co for Office Supplies within 28 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 28479332.1,
+    "one_line": "THE DELONG CO INC spend $28,479,332 is a statistical outlier (13.0\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.25,
+    "type": "yoy_spend_movers",
+    "severity": 0.7077848383725066,
     "entities": {
-      "supplier": "Delta_Logistics",
-      "item": "Raw Materials"
+      "supplier": "THE ANDERSONS INC",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 5,
-      "window_days": 21,
-      "redundant_orders": 4,
-      "est_extra_shipping": 1000.0
+      "spend": 4724548.81,
+      "prev_spend": 564704.16,
+      "dollar_change": 4159844.65,
+      "pct_change": 7.3664,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00290",
-        "PO-00385",
-        "PO-00227",
-        "PO-00310",
-        "PO-00022"
-      ]
+      "row_id": "row_194"
     },
-    "est_impact_usd": 1000.0,
-    "one_line": "5 separate orders to Delta_Logistics for Raw Materials within 21 days; consolidating could save ~$1,000 in shipping/handling.",
+    "est_impact_usd": 4159844.65,
+    "one_line": "THE ANDERSONS INC spend rose $4,159,845 (+737%) YoY ($564,704 \u2192 $4,724,549).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.2173913043478261,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.6943369019194269,
     "entities": {
-      "supplier": "Alpha_Inc",
-      "item": "Packaging"
+      "signal": "high_outlier",
+      "supplier": "Cargill de Mexico S.A. de C.V."
     },
     "metrics": {
-      "orders": 4,
-      "window_days": 15,
-      "redundant_orders": 3,
-      "est_extra_shipping": 750.0
+      "spend": 25802061.45,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 11.73,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00117",
-        "PO-00436",
-        "PO-00313",
-        "PO-00383"
-      ]
+      "supplier": "Cargill de Mexico S.A. de C.V."
     },
-    "est_impact_usd": 750.0,
-    "one_line": "4 separate orders to Alpha_Inc for Packaging within 15 days; consolidating could save ~$750 in shipping/handling.",
+    "est_impact_usd": 25802061.45,
+    "one_line": "Cargill de Mexico S.A. de C.V. spend $25,802,061 is a statistical outlier (11.7\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.2173913043478261,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.6929682034368487,
     "entities": {
-      "supplier": "Beta_Supplies",
-      "item": "Raw Materials"
+      "signal": "high_outlier",
+      "supplier": "Trevisan Agrobusiness Trade Impex"
     },
     "metrics": {
-      "orders": 4,
-      "window_days": 30,
-      "redundant_orders": 3,
-      "est_extra_shipping": 750.0
+      "spend": 25597883.21,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 11.63,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00697",
-        "PO-00415",
-        "PO-00329",
-        "PO-00317"
-      ]
+      "supplier": "Trevisan Agrobusiness Trade Impex"
     },
-    "est_impact_usd": 750.0,
-    "one_line": "4 separate orders to Beta_Supplies for Raw Materials within 30 days; consolidating could save ~$750 in shipping/handling.",
+    "est_impact_usd": 25597883.21,
+    "one_line": "Trevisan Agrobusiness Trade Impex spend $25,597,883 is a statistical outlier (11.6\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.2173913043478261,
+    "type": "yoy_spend_movers",
+    "severity": 0.6857624694008586,
     "entities": {
-      "supplier": "Delta_Logistics",
-      "item": "Electronics"
+      "supplier": "SAP AMERICA INC.",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 4,
-      "window_days": 23,
-      "redundant_orders": 3,
-      "est_extra_shipping": 750.0
+      "spend": 4103150.92,
+      "prev_spend": 375000.0,
+      "dollar_change": 3728150.92,
+      "pct_change": 9.9417,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00539",
-        "PO-00510",
-        "PO-00655",
-        "PO-00498"
-      ]
+      "row_id": "row_147"
     },
-    "est_impact_usd": 750.0,
-    "one_line": "4 separate orders to Delta_Logistics for Electronics within 23 days; consolidating could save ~$750 in shipping/handling.",
+    "est_impact_usd": 3728150.92,
+    "one_line": "SAP AMERICA INC. spend rose $3,728,151 (+994%) YoY ($375,000 \u2192 $4,103,151).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.2173913043478261,
+    "type": "negative_or_anomalous_spend",
+    "severity": 0.669194110259812,
     "entities": {
-      "supplier": "Gamma_Co",
-      "item": "MRO"
+      "signal": "high_outlier",
+      "supplier": "NORFOLK SOUTHERN CORPORATION"
     },
     "metrics": {
-      "orders": 4,
-      "window_days": 14,
-      "redundant_orders": 3,
-      "est_extra_shipping": 750.0
+      "spend": 22320890.99,
+      "mean_spend": 192353.93,
+      "std_spend": 2183905.83,
+      "z_score": 10.13,
+      "outlier_k": 3.0
     },
     "evidence": {
-      "row_ids": [
-        "PO-00490",
-        "PO-00085",
-        "PO-00331",
-        "PO-00714"
-      ]
+      "supplier": "NORFOLK SOUTHERN CORPORATION"
     },
-    "est_impact_usd": 750.0,
-    "one_line": "4 separate orders to Gamma_Co for MRO within 14 days; consolidating could save ~$750 in shipping/handling.",
+    "est_impact_usd": 22320890.99,
+    "one_line": "NORFOLK SOUTHERN CORPORATION spend $22,320,891 is a statistical outlier (10.1\u03c3 above the $192,354 mean) \u2014 concentration / data-quality check.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.2173913043478261,
+    "type": "yoy_spend_movers",
+    "severity": 0.6627095199196767,
     "entities": {
-      "supplier": "Epsilon_Group",
-      "item": "Raw Materials"
+      "supplier": "Castrolanda - Agroindustrial Cooperative",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 4,
-      "window_days": 13,
-      "redundant_orders": 3,
-      "est_extra_shipping": 750.0
+      "spend": 3535498.69,
+      "prev_spend": 198852.36,
+      "dollar_change": 3336646.32,
+      "pct_change": 16.7795,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00028",
-        "PO-00691",
-        "PO-00018",
-        "PO-00069"
-      ]
+      "row_id": "row_92"
     },
-    "est_impact_usd": 750.0,
-    "one_line": "4 separate orders to Epsilon_Group for Raw Materials within 13 days; consolidating could save ~$750 in shipping/handling.",
+    "est_impact_usd": 3336646.32,
+    "one_line": "Castrolanda - Agroindustrial Cooperative spend rose $3,336,646 (+1678%) YoY ($198,852 \u2192 $3,535,499).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.2173913043478261,
+    "type": "yoy_spend_movers",
+    "severity": 0.6264450797530651,
     "entities": {
-      "supplier": "Delta_Logistics",
-      "item": "MRO"
+      "supplier": "Agromat Com. Rep. Agricultural Products",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 4,
-      "window_days": 28,
-      "redundant_orders": 3,
-      "est_extra_shipping": 750.0
+      "spend": 5497447.55,
+      "prev_spend": 2678878.98,
+      "dollar_change": 2818568.58,
+      "pct_change": 1.0521,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00445",
-        "PO-00323",
-        "PO-00237",
-        "PO-00740"
-      ]
+      "row_id": "row_870"
     },
-    "est_impact_usd": 750.0,
-    "one_line": "4 separate orders to Delta_Logistics for MRO within 28 days; consolidating could save ~$750 in shipping/handling.",
+    "est_impact_usd": 2818568.58,
+    "one_line": "Agromat Com. Rep. Agricultural Products spend rose $2,818,569 (+105%) YoY ($2,678,879 \u2192 $5,497,448).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.18181818181818182,
+    "type": "yoy_spend_movers",
+    "severity": 0.5946315671172479,
     "entities": {
-      "supplier": "Alpha_Inc",
-      "item": "Raw Materials"
+      "supplier": "PWC US TAX LLP",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 3,
-      "window_days": 16,
-      "redundant_orders": 2,
-      "est_extra_shipping": 500.0
+      "spend": 3262807.19,
+      "prev_spend": 822402.23,
+      "dollar_change": 2440404.96,
+      "pct_change": 2.9674,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00123",
-        "PO-00155",
-        "PO-00243"
-      ]
+      "row_id": "row_419"
     },
-    "est_impact_usd": 500.0,
-    "one_line": "3 separate orders to Alpha_Inc for Raw Materials within 16 days; consolidating could save ~$500 in shipping/handling.",
+    "est_impact_usd": 2440404.96,
+    "one_line": "PWC US TAX LLP spend rose $2,440,405 (+297%) YoY ($822,402 \u2192 $3,262,807).",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.18181818181818182,
+    "type": "new_and_churned_suppliers",
+    "severity": 0.5897220885814358,
     "entities": {
-      "supplier": "Alpha_Inc",
-      "item": "Electronics"
+      "supplier": "SIEMENS INDUSTRIAL TURBOMACHINERY L",
+      "signal": "churned"
     },
     "metrics": {
-      "orders": 3,
-      "window_days": 25,
-      "redundant_orders": 2,
-      "est_extra_shipping": 500.0
+      "spend": 0.4,
+      "prev_spend": 1193635.03
     },
     "evidence": {
-      "row_ids": [
-        "PO-00203",
-        "PO-00094",
-        "PO-00067"
-      ]
+      "row_id": "row_929"
     },
-    "est_impact_usd": 500.0,
-    "one_line": "3 separate orders to Alpha_Inc for Electronics within 25 days; consolidating could save ~$500 in shipping/handling.",
+    "est_impact_usd": 1193635.03,
+    "one_line": "SIEMENS INDUSTRIAL TURBOMACHINERY L appears CHURNED: $1,193,635 prior \u2192 ~$0 current spend.",
     "source": "detector"
   },
   {
-    "type": "fragmented_orders",
-    "severity": 0.18181818181818182,
+    "type": "yoy_spend_movers",
+    "severity": 0.5876358161816732,
     "entities": {
-      "supplier": "Beta_Supplies",
-      "item": "MRO"
+      "supplier": "SEYAL TCHAD SA",
+      "direction": "rose"
     },
     "metrics": {
-      "orders": 3,
-      "window_days": 22,
-      "redundant_orders": 2,
-      "est_extra_shipping": 500.0
+      "spend": 2779528.88,
+      "prev_spend": 414455.31,
+      "dollar_change": 2365073.57,
+      "pct_change": 5.7065,
+      "sign_flip": false
     },
     "evidence": {
-      "row_ids": [
-        "PO-00465",
-        "PO-00478",
-        "PO-00210"
-      ]
+      "row_id": "row_243"
     },
-    "est_impact_usd": 500.0,
-    "one_line": "3 separate orders to Beta_Supplies for MRO within 22 days; consolidating could save ~$500 in shipping/handling.",
+    "est_impact_usd": 2365073.57,
+    "one_line": "SEYAL TCHAD SA spend rose $2,365,074 (+571%) YoY ($414,455 \u2192 $2,779,529).",
+    "source": "detector"
+  },
+  {
+    "type": "yoy_spend_movers",
+    "severity": 0.5793787929517346,
+    "entities": {
+      "supplier": "RENTECH BOILER SYSTEMS INC",
+      "direction": "rose"
+    },
+    "metrics": {
+      "spend": 3036729.7,
+      "prev_spend": 757344.9,
+      "dollar_change": 2279384.8,
+      "pct_change": 3.0097,
+      "sign_flip": false
+    },
+    "evidence": {
+      "row_id": "row_416"
+    },
+    "est_impact_usd": 2279384.8,
+    "one_line": "RENTECH BOILER SYSTEMS INC spend rose $2,279,385 (+301%) YoY ($757,345 \u2192 $3,036,730).",
+    "source": "detector"
+  },
+  {
+    "type": "new_and_churned_suppliers",
+    "severity": 0.37983916238927384,
+    "entities": {
+      "supplier": "KENCO LOGISTICS SERVICES LLC",
+      "signal": "churned"
+    },
+    "metrics": {
+      "spend": 0.0,
+      "prev_spend": 451236.43
+    },
+    "evidence": {
+      "row_id": "row_908"
+    },
+    "est_impact_usd": 451236.43,
+    "one_line": "KENCO LOGISTICS SERVICES LLC appears CHURNED: $451,236 prior \u2192 ~$0 current spend.",
+    "source": "detector"
+  },
+  {
+    "type": "new_and_churned_suppliers",
+    "severity": 0.135504144375938,
+    "entities": {
+      "supplier": "Flavia Simoes Luz Ltda",
+      "signal": "churned"
+    },
+    "metrics": {
+      "spend": 0.0,
+      "prev_spend": 41069.19
+    },
+    "evidence": {
+      "row_id": "row_911"
+    },
+    "est_impact_usd": 41069.19,
+    "one_line": "Flavia Simoes Luz Ltda appears CHURNED: $41,069 prior \u2192 ~$0 current spend.",
+    "source": "detector"
+  },
+  {
+    "type": "supplier_concentration",
+    "severity": 0.13516516868721323,
+    "entities": {
+      "top_supplier": "Bartlett and Company of Mexico"
+    },
+    "metrics": {
+      "top_n": 10,
+      "top_n_share": 0.2267,
+      "top_n_spend": 519879381.37,
+      "total_positive_spend": 2292859147.34,
+      "hhi": 0.0109,
+      "n_suppliers": 11920,
+      "largest_supplier_spend": 173598675.37
+    },
+    "evidence": {
+      "top_suppliers": {
+        "Bartlett and Company of Mexico": 173598675.37,
+        "C Vale - Agroindustrial Cooperative": 114580880.55,
+        "FARM CITY ELEVATOR INC": 45691833.96,
+        "THE SCOULAR COMPANY": 40816225.96,
+        "THE DELONG CO INC": 28479332.1,
+        "Cargill de Mexico S.A. de C.V.": 25802061.45,
+        "Trevisan Agrobusiness Trade Impex": 25597883.21,
+        "NORFOLK SOUTHERN CORPORATION": 22320890.99,
+        "MEEZAN BANK LIMITED": 21812125.4,
+        "AGRANA STARKE GMBH": 21179472.39
+      }
+    },
+    "est_impact_usd": 519879381.37,
+    "one_line": "Top 10 suppliers account for 23% of $2,292,859,147 total positive spend (HHI 0.011, 11920 suppliers); largest is Bartlett and Company of Mexico at $173,598,675.",
+    "source": "detector"
+  },
+  {
+    "type": "new_and_churned_suppliers",
+    "severity": 0.11764184330827206,
+    "entities": {
+      "supplier": "TILLEKE & GIBBINS INTERNATIONAL",
+      "signal": "churned"
+    },
+    "metrics": {
+      "spend": 0.0,
+      "prev_spend": 19993.97
+    },
+    "evidence": {
+      "row_id": "row_925"
+    },
+    "est_impact_usd": 19993.97,
+    "one_line": "TILLEKE & GIBBINS INTERNATIONAL appears CHURNED: $19,994 prior \u2192 ~$0 current spend.",
+    "source": "detector"
+  },
+  {
+    "type": "new_and_churned_suppliers",
+    "severity": 0.10951781852836594,
+    "entities": {
+      "supplier": "Martin Engineering Mexico",
+      "signal": "churned"
+    },
+    "metrics": {
+      "spend": 0.0,
+      "prev_spend": 10688.39
+    },
+    "evidence": {
+      "row_id": "row_916"
+    },
+    "est_impact_usd": 10688.39,
+    "one_line": "Martin Engineering Mexico appears CHURNED: $10,688 prior \u2192 ~$0 current spend.",
     "source": "detector"
   }
 ]

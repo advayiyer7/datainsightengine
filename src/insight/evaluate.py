@@ -366,6 +366,15 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_loaded, gold_curate
     b0_growth = (sc["B0_est_usd"].iloc[-1] - sc["B0_est_usd"].iloc[0]) if len(sc) > 1 else 0.0
     sys_growth = (sc["SYS_est_usd"].iloc[-1] - sc["SYS_est_usd"].iloc[0]) if len(sc) > 1 else 0.0
 
+    b0_note = b0r.get("note", "")
+    b0_failed = b0r.get("n_findings", 0) == 0 and ("fail" in b0_note.lower() or "credit" in b0_note.lower())
+    if b0_failed:
+        lines.append(
+            "> ⚠ **B0 / FULL did not complete at full data this run** (LLM call failed — see the note "
+            "column, e.g. API credit exhaustion). The detector tiers (B1), the narrator (SYS), the "
+            "grounding guard, and the cost-scaling sweep above all completed; only the full-data "
+            "dump-to-LLM baseline and the agentic tier are missing. Re-run with API credit to fill them.\n")
+
     lines.append("## What the run showed\n")
     if llm_available:
         verdict = []
@@ -404,15 +413,21 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_loaded, gold_curate
             f"- **Cost scaling:** as rows grew, B0 cost rose by ${b0_growth:.4f} while SYS rose by "
             f"${sys_growth:.4f} — " + ("SYS stays ~flat, B0 climbs (thesis supported)."
                                        if b0_growth > sys_growth else "scaling was inconclusive here."))
-        verdict.append(
-            f"- **Quality — recall:** SYS {sys_recall:.2f} vs B0 {b0_recall:.2f} (see the recall caveat "
-            "above — this is bounded by construction, not a clean win).")
-        verdict.append(
-            f"- **Quality — precision (LLM-judge 0–2):** SYS {sys_prec:.2f} ({sys_n} insights) vs "
-            f"B0 {b0_prec:.2f} ({b0_n} insights). "
-            + ("SYS now matches or beats B0 on per-finding validity while keeping recall + low cost."
-               if sys_prec >= b0_prec - 0.05
-               else "B0 still edges per-finding validity; SYS wins on recall + cost."))
+        if b0_failed:
+            verdict.append(
+                f"- **Quality:** SYS recall {sys_recall:.2f}, per-finding validity {sys_prec:.2f} "
+                f"({sys_n} insights); B0 did not complete this run, so no SYS-vs-B0 quality comparison "
+                "is available (the cost-scaling sweep above still ran B0 across slices).")
+        else:
+            verdict.append(
+                f"- **Quality — recall:** SYS {sys_recall:.2f} vs B0 {b0_recall:.2f} (see the recall caveat "
+                "above — this is bounded by construction, not a clean win).")
+            verdict.append(
+                f"- **Quality — precision (LLM-judge 0–2):** SYS {sys_prec:.2f} ({sys_n} insights) vs "
+                f"B0 {b0_prec:.2f} ({b0_n} insights). "
+                + ("SYS now matches or beats B0 on per-finding validity while keeping recall + low cost."
+                   if sys_prec >= b0_prec - 0.05
+                   else "B0 still edges per-finding validity; SYS wins on recall + cost."))
         if narr.grounding.ok:
             verdict.append(
                 f"- **Grounding:** narrator cited {narr.grounding.matched}/{narr.grounding.total_numbers} "
@@ -441,12 +456,14 @@ def _write_results_md(quality_rows, scaling_rows, gold, gold_loaded, gold_curate
         lines.append(f"\n![quality vs cost]({Path(chart_path).name})")
 
     lines.append("\n## Honest caveats\n")
-    lines.append("- This dataset has no SKU column, so `item` falls back to `Item_Category` (5 broad "
-                 "categories). `maverick_price_variance` therefore benchmarks the cheapest *supplier "
-                 "average* per category rather than per-SKU prices — its dollar figures are an upper "
-                 "bound on savings, not a precise number.")
-    lines.append("- Shipping/handling and processing costs in `fragmented_orders`/`tail_spend` are "
-                 "configurable assumptions (`config.yaml`), not measured values.")
+    lines.append("- Spend-grain data is one row per supplier-year, single year (2025): \"trend\" means "
+                 "the in-row `prevYearSpend` comparison, not a multi-year series.")
+    lines.append("- The provided `yoyChange` ratio and `flagGreaterThan50PercentChange` are NOT used "
+                 "as truth (tiny `prevYearSpend` denominators make ~69% of rows flag TRUE). YoY is "
+                 "recomputed robustly with a `base_floor` and a `min_abs_change` gate.")
+    lines.append("- `tail_spend` admin overhead (`admin_cost_per_supplier`) is a configurable "
+                 "assumption, not a measured value; negative `totalSpend` is surfaced as a data-quality "
+                 "signal, not netted into totals.")
 
     md = "\n".join(lines)
     (out_dir / "RESULTS.md").write_text(md, encoding="utf-8")

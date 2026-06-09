@@ -27,13 +27,11 @@ from .llm import LLMClient
 
 # Stricter overrides layered on top of the user's detector config: fewer, surer hits.
 STRICT_OVERRIDES: dict[str, dict[str, Any]] = {
-    "fragmented_orders": {"min_orders": 5},
-    "supplier_concentration": {"share_threshold": 0.45, "hhi_threshold": 0.27},
-    "maverick_price_variance": {"variance_pct": 0.20},
+    "supplier_concentration": {},                       # always a single, solid finding
     "tail_spend": {},
-    "single_source_risk": {"min_spend": 50000.0},
-    "timing_anomaly": {"end_of_period_share": 0.45},
-    "duplicate_order": {},
+    "yoy_spend_movers": {"min_abs_change": 100000.0, "top_k": 5},
+    "negative_or_anomalous_spend": {"outlier_k": 4.0, "top_outliers": 5},
+    "new_and_churned_suppliers": {"material": 50000.0},
 }
 
 

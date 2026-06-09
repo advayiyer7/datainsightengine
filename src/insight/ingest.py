@@ -20,12 +20,20 @@ import pandas as pd
 # Canonical field -> synonyms (lowercased, non-alphanumeric stripped for matching).
 CANONICAL_SYNONYMS: dict[str, list[str]] = {
     "supplier": ["supplier", "vendor", "supplier_name", "vendor_name", "seller", "merchant"],
+    # --- spend-grain fields (one row per supplier-year) ---
+    "spend": ["spend", "total_spend", "totalspend", "annual_spend", "spend_usd", "current_spend"],
+    "prev_spend": ["prev_spend", "prevyearspend", "previous_spend", "prior_spend",
+                   "last_year_spend", "prevspend", "prior_year_spend"],
+    "yoy_change": ["yoy_change", "yoychange", "yoy", "year_over_year", "yoy_pct"],
+    "year": ["year", "fiscal_year", "fy", "yr"],
+    "spend_flag": ["flaggreaterthan50percentchange", "flag", "change_flag", "spend_flag"],
+    # --- transaction-grain fields (legacy; absent on spend data) ---
     "item": ["item", "sku", "product", "material", "part", "item_name", "description", "item_category"],
     "category": ["category", "item_category", "commodity", "spend_category", "class", "type"],
     "quantity": ["quantity", "qty", "units", "order_quantity", "amount_units", "volume"],
     "unit_price": ["unit_price", "unitcost", "price", "unit_cost", "price_per_unit", "rate"],
     "negotiated_price": ["negotiated_price", "negotiated", "contract_price", "agreed_price"],
-    "total": ["total", "total_price", "amount", "total_cost", "line_total", "extended_price", "spend"],
+    "total": ["total", "total_price", "amount", "total_cost", "line_total", "extended_price"],
     "order_date": ["order_date", "po_date", "purchase_date", "date", "created_date", "orderdate"],
     "delivery_date": ["delivery_date", "received_date", "ship_date", "receipt_date", "deliverydate"],
     "lead_time": ["lead_time", "leadtime", "lead_time_days", "delivery_days"],
@@ -38,9 +46,12 @@ CANONICAL_SYNONYMS: dict[str, list[str]] = {
     "po_id": ["po_id", "po", "order_id", "purchase_order", "id", "po_number", "ponumber"],
 }
 
-# Fields a detector run cannot proceed without. ``unit_price`` OR ``total`` suffices.
-REQUIRED = ["supplier", "item", "quantity", "order_date"]
-REQUIRED_PRICE = ["unit_price", "total"]  # at least one
+# The engine supports two data grains. Required fields differ per grain:
+#   * spend grain  (one row per supplier-year): supplier, spend, prev_spend
+#   * transaction grain (one row per PO line):  supplier, item, quantity, order_date + price
+REQUIRED_SPEND = ["supplier", "spend", "prev_spend"]
+REQUIRED_TXN = ["supplier", "item", "quantity", "order_date"]
+REQUIRED_TXN_PRICE = ["unit_price", "total"]  # at least one, transaction grain only
 
 
 def _norm(s: str) -> str:
@@ -58,14 +69,21 @@ class SchemaMapping:
         return self.mapping.get(field_name)
 
     @property
+    def grain(self) -> str:
+        """Which data grain this CSV is — decided by whether a ``spend`` column mapped."""
+        return "spend" if self.mapping.get("spend") else "transaction"
+
+    @property
     def missing_required(self) -> list[str]:
-        miss = [f for f in REQUIRED if not self.mapping.get(f)]
-        if not any(self.mapping.get(f) for f in REQUIRED_PRICE):
+        if self.grain == "spend":
+            return [f for f in REQUIRED_SPEND if not self.mapping.get(f)]
+        miss = [f for f in REQUIRED_TXN if not self.mapping.get(f)]
+        if not any(self.mapping.get(f) for f in REQUIRED_TXN_PRICE):
             miss.append("unit_price|total")
         return miss
 
     def render(self) -> str:
-        lines = ["Resolved schema mapping (canonical <- source column):"]
+        lines = [f"Resolved schema mapping (detected grain: {self.grain}):"]
         for canon in CANONICAL_SYNONYMS:
             src = self.mapping.get(canon)
             if src:
@@ -142,6 +160,8 @@ class CleanReport:
     bad_dates: int = 0
     supplier_variants_merged: int = 0
     derived: list[str] = field(default_factory=list)
+    # --- spend-grain data-quality signals ---
+    dq: dict[str, Any] = field(default_factory=dict)
 
     def render(self) -> str:
         lines = ["Cleaning report:"]
@@ -158,6 +178,17 @@ class CleanReport:
             lines.append(f"  supplier name variants normalized: {self.supplier_variants_merged}")
         if self.derived:
             lines.append("  derived columns: " + ", ".join(self.derived))
+        if self.dq:
+            lines.append("  data-quality (spend grain):")
+            d = self.dq
+            lines.append(f"    negative totalSpend rows: {d.get('negatives', 0)} "
+                         f"(min ${d.get('most_negative', 0):,.0f})")
+            lines.append(f"    near-zero prevYearSpend rows (<$1): {d.get('near_zero_prev', 0)} "
+                         "— inflate the provided yoyChange; recomputed robustly downstream")
+            lines.append(f"    statistical spend outliers (>mean+3sigma): {d.get('outliers', 0)}")
+            if "provided_flag_true_frac" in d:
+                lines.append(f"    provided flagGreaterThan50PercentChange TRUE: "
+                             f"{d['provided_flag_true_frac']:.0%} of rows (NOISE — not used as truth)")
         return "\n".join(lines)
 
 
@@ -195,7 +226,8 @@ def clean(
     # Numerics. Strip currency symbols / thousands separators / parens-negatives
     # ("$1,234.50", "(45.00)") before coercion so prices written as money parse.
     for col in ["quantity", "unit_price", "negotiated_price", "total",
-                "shipping_cost", "lead_time", "risk_score", "defective_units"]:
+                "shipping_cost", "lead_time", "risk_score", "defective_units",
+                "spend", "prev_spend", "yoy_change", "year"]:
         if col in out.columns:
             # Non-numeric (object OR pandas-3.0 `str` dtype) may hold currency text
             # like "$1,234.00" or "(45.00)" — strip it before coercion.
@@ -264,17 +296,38 @@ def clean(
     elif "lead_time" in out.columns:
         out["lead_time_days"] = out["lead_time"]
 
-    # Drop rows missing required values for detection.
-    required_present = [c for c in ["supplier", "item", "quantity", "order_date"] if c in out.columns]
+    # Drop rows missing required values for detection (grain-aware). NOTE: negative
+    # spend is NOT missing — it's kept (refunds/credits/anomalies are real signal).
+    if sm.grain == "spend":
+        req = [c for c in REQUIRED_SPEND if c in out.columns]
+    else:
+        req = [c for c in REQUIRED_TXN if c in out.columns]
     before = len(out)
-    if required_present:
-        mask = out[required_present].notna().all(axis=1)
-        # also need some price signal
-        if "total" in out.columns:
-            mask &= out["total"].notna()
+    if req:
+        mask = out[req].notna().all(axis=1)
+        if sm.grain != "spend" and "total" in out.columns:
+            mask &= out["total"].notna()  # transaction grain needs a price signal
         out = out[mask].copy()
     rep.dropped_missing_required = before - len(out)
     rep.rows_out = len(out)
+
+    # --- spend-grain data-quality report (informational; never used as truth) ---
+    if sm.grain == "spend" and "spend" in out.columns:
+        spend = out["spend"]
+        dq: dict[str, Any] = {
+            "negatives": int((spend < 0).sum()),
+            "most_negative": float(spend.min()) if len(spend) else 0.0,
+        }
+        if "prev_spend" in out.columns:
+            dq["near_zero_prev"] = int((out["prev_spend"].abs() < 1.0).sum())
+        pos = spend[spend > 0]
+        if len(pos) > 1:
+            thresh = float(pos.mean() + 3 * pos.std(ddof=0))
+            dq["outliers"] = int((spend > thresh).sum())
+        if "spend_flag" in out.columns:
+            flag = out["spend_flag"].astype(str).str.strip().str.lower()
+            dq["provided_flag_true_frac"] = float((flag == "true").mean())
+        rep.dq = dq
 
     out = out.reset_index(drop=True)
     return out, rep
